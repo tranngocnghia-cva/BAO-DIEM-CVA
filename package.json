@@ -5,7 +5,8 @@
   "scripts": {
     "local": "python tools/local_server.py",
     "sync": "python tools/sync_and_upload.py",
-    "dev": "wrangler pages dev ."
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
   },
   "devDependencies": {
     "wrangler": "^4.160.0"

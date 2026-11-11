@@ -1,6 +1,12 @@
-name = "bao-diem"
+name = "bao-diem-cva"
+main = "worker.js"
 compatibility_date = "2024-09-23"
-pages_build_output_dir = "."
+
+# Biên dịch trực tiếp index.html thành text module trong Worker
+[[rules]]
+type = "Text"
+globs = ["**/*.html"]
+fallthrough = true
 
 # Cấu hình Cloudflare D1 Database (Serverless SQLite)
 [[d1_databases]]
