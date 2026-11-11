@@ -151,8 +151,8 @@ Hệ thống được thiết kế theo mô hình quan hệ linh hoạt:
 
 > **Lưu ý quan trọng**: 
 > - Học sinh **không cần chọn phương thức**: Giao diện chỉ có 2 ô nhập, máy chủ tự động nhận diện và đối chiếu.
-> - **MSHS chính thức** là **5 chữ số trong Email trường** (ví dụ: `26040`, `24001`). Hệ thống cũng hỗ trợ học sinh gõ email trường đầy đủ hoặc mã thi cũ.
-> - **Bảo mật tuyệt đối**: **Không có mật khẩu chung của trường**. Mỗi học sinh chỉ xác thực bằng chính **Ngày tháng năm sinh** của mình (`14/04/2011` hoặc `14042011`) hoặc mật khẩu cá nhân. Mọi mật khẩu chung đều bị từ chối.
+> - **MSHS chính thức** là **5 chữ số trong Email trường** (ví dụ: `26001`, `24001`). Hệ thống cũng hỗ trợ học sinh gõ email trường đầy đủ hoặc mã thi cũ.
+> - **Bảo mật tuyệt đối**: **Không có mật khẩu chung của trường**. Mỗi học sinh chỉ xác thực bằng chính **Ngày tháng năm sinh** của mình (ví dụ: `01/01/2011` hoặc `01012011`). Mọi mật khẩu chung đều bị từ chối.
 
 ### Bảng tài khoản mẫu kiểm thử:
 | Cơ sở | Ô 1: MSHS hoặc Email | Ô 2: Ngày sinh (hoặc mật khẩu riêng) | Họ và tên | Lớp | Điểm Toán |

@@ -126,7 +126,7 @@
                 <input
                   type="text"
                   v-model="form.identifier"
-                  placeholder="Ví dụ: 26040 hoặc 24001"
+                  placeholder="Ví dụ: 26001 hoặc 26001@ttgdtxcva.edu.vn"
                   class="w-full px-3.5 sm:px-4 py-3 sm:py-3.5 rounded-xl border border-slate-300 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all font-medium text-slate-800 placeholder-slate-400 text-base pr-11"
                   required
                   autocomplete="off"
@@ -136,7 +136,7 @@
                 </div>
               </div>
               <p class="text-[11px] sm:text-xs text-slate-500 mt-1.5">
-                Nhập <strong class="text-slate-700 font-semibold">5 chữ số trong email trường</strong> của em (ví dụ: <code class="bg-slate-100 px-1 py-0.5 rounded text-blue-700 font-bold">26040</code>, <code class="bg-slate-100 px-1 py-0.5 rounded text-blue-700 font-bold">24001</code>) hoặc email đầy đủ.
+                Nhập <strong class="text-slate-700 font-semibold">5 chữ số trong email trường</strong> của em (ví dụ: <code class="bg-slate-100 px-1 py-0.5 rounded text-blue-700 font-bold">26001</code>) hoặc email đầy đủ.
               </p>
             </div>
 
@@ -151,7 +151,7 @@
                   type="text"
                   v-model="form.dob"
                   @input="formatDobInput"
-                  placeholder="DD/MM/YYYY (Ví dụ: 14/04/2011)"
+                  placeholder="DD/MM/YYYY (Ví dụ: 01/01/2011)"
                   maxlength="10"
                   class="w-full px-3.5 sm:px-4 py-3 sm:py-3.5 rounded-xl border border-slate-300 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all font-medium text-slate-800 placeholder-slate-400 text-base pr-11"
                   required
@@ -162,7 +162,7 @@
                 </div>
               </div>
               <p class="text-[11px] sm:text-xs text-slate-500 mt-1.5">
-                Định dạng <strong class="text-slate-700">ngày/tháng/năm</strong> (tự động thêm dấu <code class="bg-slate-100 px-1 rounded">/</code> khi gõ, ví dụ: <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-700">14/04/2011</code> hoặc gõ liền <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-700">14042011</code>).
+                Định dạng <strong class="text-slate-700">ngày/tháng/năm</strong> (tự động thêm dấu <code class="bg-slate-100 px-1 rounded">/</code> khi gõ, ví dụ: <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-700">01/01/2011</code> hoặc gõ liền <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-700">01012011</code>).
               </p>
             </div>
 
@@ -622,7 +622,7 @@
           }
         };
 
-        // Hỗ trợ URL params: ?mshs=26040&dob=14/04/2011
+        // Hỗ trợ URL params: ?mshs=26001&dob=01/01/2011
         onMounted(() => {
           window.addEventListener('keydown', handleKeydown);
 

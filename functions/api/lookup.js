@@ -121,7 +121,7 @@ export async function onRequestPost(context) {
     if (!studentRow) {
       return new Response(
         JSON.stringify({
-          error: "Không tìm thấy học sinh với thông tin này. Gợi ý: Nhập đúng 5 số mã học sinh (5 số trong email trường của em, ví dụ: 26040, 24001)!",
+          error: "Không tìm thấy học sinh với thông tin này. Gợi ý: Nhập đúng 5 số mã học sinh (5 số trong email trường của em, ví dụ: 26001)!",
         }),
         { status: 400, headers: corsHeaders }
       );

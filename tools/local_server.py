@@ -90,7 +90,7 @@ def verify_student_password(student, password):
 def query_student_scores(data):
     """
     Truy vấn thông tin học sinh và điểm số các môn:
-    - Identifier: MSHS (5 số trong email trường, ví dụ: 26040, 24001), Email trường, hoặc SBD thi cũ
+    - Identifier: MSHS (5 số trong email trường, ví dụ: 26001), Email trường, hoặc SBD thi cũ
     - DOB / Secret: Ngày tháng năm sinh (dd/mm/yyyy hoặc ddmmyyyy)
     """
     if not LOCAL_DB_PATH.exists():
@@ -121,7 +121,7 @@ def query_student_scores(data):
     
     if not student_row:
         conn.close()
-        return {"error": "Không tìm thấy học sinh với thông tin này. Gợi ý: Nhập đúng 5 số mã học sinh (5 số trong email trường của em, ví dụ: 26040, 24001)!"}
+        return {"error": "Không tìm thấy học sinh với thông tin này. Gợi ý: Nhập đúng 5 số mã học sinh (5 số trong email trường của em, ví dụ: 26001)!"}
         
     student_data = dict(student_row)
     
