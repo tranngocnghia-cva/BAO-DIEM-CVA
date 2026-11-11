@@ -147,8 +147,9 @@ Hệ thống được thiết kế theo mô hình quan hệ linh hoạt:
 
 ---
 
-## 5. TÀI KHOẢN HỌC SINH MẪU ĐỂ KIỂM THỬ
+## 5. TÀI KHOẢN HỌC SINH MẪU ĐỂ KIỂM THỬ (CẢ 2 PHƯƠNG THỨC)
 
+### Cách 1: Tra cứu bằng Mã số học sinh & Ngày sinh
 | Cơ sở | Mã số HS (SBD) | Ngày sinh | Họ và tên | Lớp | Điểm Toán |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **An Đông** | `10000001` | `14/04/2011` | NGÔ DIỆU ÁI | 10A1 | 3.35 đ |
@@ -157,4 +158,11 @@ Hệ thống được thiết kế theo mô hình quan hệ linh hoạt:
 | **Chợ Lớn** | `A0000002` | `10/08/2009` | HUỲNH TUẤN ĐẠT | 10A | 9.25 đ |
 | **Chợ Lớn** | `A0000160` | `03/04/2007` | NGUYỄN QUỐC ANH | 12C | 7.75 đ |
 | **Chợ Lớn** | `A0000172` | `20/09/2007` | HOÀNG LÊ TRÀ MY | 12C | 10.00 đ |
-| **Vắng thi**| `A0000047` | `01/01/2009` | TRẦN DŨNG KIỆT | 10C | Vắng thi |
+
+### Cách 2: Đăng nhập bằng Email trường (@ttgdtxcva.edu.vn) & Mật khẩu
+| Email trường | Mã tài khoản | Mật khẩu mặc định | Họ và tên | Lớp |
+| :--- | :--- | :--- | :--- | :--- |
+| `24001@ttgdtxcva.edu.vn` | `24001` | `27022009` *(hoặc `cva@123`)* | MAI HỒNG AN | 12A1 |
+| `26040@ttgdtxcva.edu.vn` | `26040` | `14042011` *(hoặc `cva@123`)* | NGÔ DIỆU ÁI | 10A1 |
+| `24469@ttgdtxcva.edu.vn` | `24469` | `08102008` *(hoặc `cva@123`)* | TO HOÀI ÂN | 12A1 |
+| `24002@ttgdtxcva.edu.vn` | `24002` | `15122009` *(hoặc `cva@123`)* | LÝ GIA BẢO | 12A1 |

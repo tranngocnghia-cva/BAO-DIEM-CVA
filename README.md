@@ -6,7 +6,9 @@
 
 ## ✨ Tính Năng Nổi Bật
 
-- 🔍 **Tra cứu bảo mật hai lớp**: Học sinh nhập **Mã số học sinh (MSHS)** và **Ngày tháng năm sinh (DOB)** để mở khóa bảng điểm và bài làm.
+- 🔐 **Linh hoạt 2 phương thức xác thực (Dual-Mode)**:
+  - **Phương thức 1**: Tra cứu nhanh bằng **Mã số học sinh (MSHS)** và **Ngày tháng năm sinh (DOB)** — tiện lợi cho học sinh và phụ huynh xem điểm nhanh không cần nhớ mật khẩu.
+  - **Phương thức 2**: Đăng nhập bằng **Email trường Google Workspace (@ttgdtxcva.edu.vn)** hoặc **Mã tài khoản** (ví dụ: `24001`, `26040`) kèm **Mật khẩu** (mặc định là Ngày sinh ddmmyyyy). Có nút bật/tắt hiển thị mật khẩu.
 - 📊 **Bảng điểm chuẩn Bộ GD&ĐT**:
   - Điểm tổng kết và xếp loại (Xuất sắc, Giỏi, Khá, Đạt).
   - Phân tích chi tiết 3 phần thi: Phần I (Trắc nghiệm nhiều lựa chọn), Phần II (Đúng/Sai), Phần III (Trả lời ngắn).

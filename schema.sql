@@ -40,11 +40,16 @@ CREATE TABLE IF NOT EXISTS students (
     gender TEXT,                        -- Nam / Nữ
     dob TEXT NOT NULL,                  -- Ngày sinh dạng DD/MM/YYYY (ví dụ: 14/04/2011)
     campus TEXT DEFAULT 'AN-DONG',      -- AN-DONG hoặc CHO-LON
+    email TEXT UNIQUE,                  -- Email trường (ví dụ: 24001@ttgdtxcva.edu.vn)
+    account_id TEXT,                    -- Mã số tài khoản Google (ví dụ: 24001)
+    password_hash TEXT,                 -- Mật khẩu hoặc mã băm mật khẩu
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- Tạo Index để tăng tốc độ tra cứu tức thì theo student_id và dob
+-- Tạo Index để tăng tốc độ tra cứu tức thì theo student_id, dob, email, account_id
 CREATE INDEX IF NOT EXISTS idx_students_lookup ON students(student_id, dob);
+CREATE INDEX IF NOT EXISTS idx_students_email ON students(email);
+CREATE INDEX IF NOT EXISTS idx_students_account ON students(account_id);
 CREATE INDEX IF NOT EXISTS idx_students_class ON students(class_name);
 
 -- 5. Bảng Điểm thi & Bài làm chi tiết (Liên kết môn học, kỳ thi, học sinh)

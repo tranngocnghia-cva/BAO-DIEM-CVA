@@ -158,6 +158,92 @@ def run_tests():
     except (urllib.error.HTTPError, urllib.error.URLError) as e:
         assert_test("Chặn tấn công Path Traversal", True)
 
+    # TEST 9: Đăng nhập bằng Email trường đầy đủ & Mật khẩu Ngày sinh (ddmmyyyy)
+    try:
+        req = urllib.request.Request(
+            f"{base_url}/api/lookup",
+            data=json.dumps({"method": "email", "email": "24001@ttgdtxcva.edu.vn", "password": "27022009"}).encode("utf-8"),
+            headers={"Content-Type": "application/json"}
+        )
+        with urllib.request.urlopen(req) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            assert_test(
+                "Đăng nhập Email trường đầy đủ (24001@ttgdtxcva.edu.vn)",
+                data.get("success") is True and data["student"]["full_name"] == "MAI HỒNG AN" and data["student"]["email"] == "24001@ttgdtxcva.edu.vn"
+            )
+            assert_test(
+                "Không để lộ password_hash về client",
+                "password_hash" not in data["student"]
+            )
+    except Exception as e:
+        assert_test("Đăng nhập Email trường đầy đủ", False, str(e))
+
+    # TEST 10: Đăng nhập bằng Mã số tài khoản rút gọn & Mật khẩu định dạng DD/MM/YYYY
+    try:
+        req = urllib.request.Request(
+            f"{base_url}/api/lookup",
+            data=json.dumps({"method": "email", "email": "24001", "password": "27/02/2009"}).encode("utf-8"),
+            headers={"Content-Type": "application/json"}
+        )
+        with urllib.request.urlopen(req) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            assert_test(
+                "Đăng nhập Mã tài khoản rút gọn (24001)",
+                data.get("success") is True and data["student"]["full_name"] == "MAI HỒNG AN"
+            )
+    except Exception as e:
+        assert_test("Đăng nhập Mã tài khoản rút gọn", False, str(e))
+
+    # TEST 11: Đăng nhập bằng Mật khẩu trường mặc định cva@123
+    try:
+        req = urllib.request.Request(
+            f"{base_url}/api/lookup",
+            data=json.dumps({"method": "email", "email": "24001", "password": "cva@123"}).encode("utf-8"),
+            headers={"Content-Type": "application/json"}
+        )
+        with urllib.request.urlopen(req) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            assert_test(
+                "Đăng nhập với mật khẩu mặc định (cva@123)",
+                data.get("success") is True and data["student"]["full_name"] == "MAI HỒNG AN"
+            )
+    except Exception as e:
+        assert_test("Đăng nhập với mật khẩu mặc định (cva@123)", False, str(e))
+
+    # TEST 12: Đăng nhập với sai mật khẩu -> Phải báo đúng lỗi
+    try:
+        req = urllib.request.Request(
+            f"{base_url}/api/lookup",
+            data=json.dumps({"method": "email", "email": "24001@ttgdtxcva.edu.vn", "password": "mat_khau_sai_hoan_toan"}).encode("utf-8"),
+            headers={"Content-Type": "application/json"}
+        )
+        urllib.request.urlopen(req)
+        assert_test("Bắt lỗi sai mật khẩu đăng nhập", False, "Đáng lẽ phải trả về lỗi 400")
+    except urllib.error.HTTPError as e:
+        err_data = json.loads(e.read().decode("utf-8"))
+        assert_test(
+            "Bắt lỗi sai mật khẩu đăng nhập",
+            e.code == 400 and "Mật khẩu không chính xác" in err_data.get("error", ""),
+            f"Code: {e.code}, Data: {err_data}"
+        )
+
+    # TEST 13: Đăng nhập với Email không tồn tại
+    try:
+        req = urllib.request.Request(
+            f"{base_url}/api/lookup",
+            data=json.dumps({"method": "email", "email": "email_khong_ton_tai@ttgdtxcva.edu.vn", "password": "123"}).encode("utf-8"),
+            headers={"Content-Type": "application/json"}
+        )
+        urllib.request.urlopen(req)
+        assert_test("Bắt lỗi email không tồn tại", False, "Đáng lẽ phải trả về lỗi 400")
+    except urllib.error.HTTPError as e:
+        err_data = json.loads(e.read().decode("utf-8"))
+        assert_test(
+            "Bắt lỗi email không tồn tại",
+            e.code == 400 and "Không tìm thấy tài khoản" in err_data.get("error", ""),
+            f"Code: {e.code}, Data: {err_data}"
+        )
+
     httpd.shutdown()
     print("=" * 60)
     print(f"   KẾT QUẢ KIỂM THỬ: {passed}/{total} BÀI KIỂM THỬ THÀNH CÔNG")
