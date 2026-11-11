@@ -1,5 +1,6 @@
 # HỆ THỐNG TRA CỨU ĐIỂM THI & BÀI LÀM HỌC SINH (SERVERLESS)
-> **Trường THPT Chu Văn An • TP. Hồ Chí Minh**  
+> **SỞ GIÁO DỤC VÀ ĐÀO TẠO THÀNH PHỐ HỒ CHÍ MINH**  
+> **TRUNG TÂM GDNN-GDTX CHU VĂN AN**  
 > Cổng thông tin tra cứu kết quả thi và bài làm trực tuyến cho học sinh (Cơ sở An Đông & Phân hiệu Chợ Lớn).  
 > Xây dựng trên nền tảng Cloudflare Serverless (Pages + D1 Database + R2 Object Storage) với chi phí vận hành $0.
 
@@ -66,4 +67,4 @@ Mở trình duyệt: `http://localhost:8787`
 Xem hướng dẫn chi tiết từng bước tại: [HUONG_DAN_TRIEN_KHAI.md](HUONG_DAN_TRIEN_KHAI.md)
 
 ---
-*Trường THPT Chu Văn An • Cổng Tra Cứu Kết Quả & Bài Thi Trực Tuyến*
+*Trung tâm GDNN-GDTX Chu Văn An • Cổng Tra Cứu Kết Quả & Bài Thi Trực Tuyến*

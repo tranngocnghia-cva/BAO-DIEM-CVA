@@ -1,5 +1,5 @@
 # HƯỚNG DẪN CHI TIẾT TRIỂN KHAI HỆ THỐNG BÁO ĐIỂM SERVERLESS
-### TRƯỜNG THPT CHU VĂN AN • HỖ TRỢ ĐA MÔN HỌC & ĐA CƠ SỞ
+### SỞ GD&ĐT TP. HỒ CHÍ MINH • TRUNG TÂM GDNN-GDTX CHU VĂN AN
 
 ---
 
