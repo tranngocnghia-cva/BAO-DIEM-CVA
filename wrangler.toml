@@ -1,0 +1,16 @@
+name = "bao-diem"
+compatibility_date = "2024-09-23"
+pages_build_output_dir = "."
+
+# Cấu hình Cloudflare D1 Database (Serverless SQLite)
+# Chạy lệnh: npx wrangler d1 create bao_diem_db để lấy database_id
+[[d1_databases]]
+binding = "DB"
+database_name = "bao_diem_db"
+database_id = "YOUR_D1_DATABASE_ID"
+
+# Cấu hình Cloudflare R2 Bucket (Lưu trữ 1.341+ file PDF)
+# Chạy lệnh: npx wrangler r2 bucket create bao-diem-pdf
+[[r2_buckets]]
+binding = "PDF_BUCKET"
+bucket_name = "bao-diem-pdf"

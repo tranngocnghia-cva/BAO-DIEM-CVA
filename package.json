@@ -1,0 +1,24 @@
+{
+  "name": "he-thong-bao-diem-thpt-chu-van-an",
+  "version": "1.0.0",
+  "description": "Website tra cứu điểm thi và xem bài làm học sinh (PDF) đa môn học - Triển khai Cloudflare Serverless",
+  "scripts": {
+    "local": "python tools/local_server.py",
+    "sync": "python tools/sync_and_upload.py",
+    "dev": "wrangler pages dev .",
+    "deploy": "wrangler pages deploy ."
+  },
+  "devDependencies": {
+    "wrangler": "^3.80.0"
+  },
+  "keywords": [
+    "bao-diem",
+    "tra-cuu-diem",
+    "chu-van-an",
+    "cloudflare-pages",
+    "cloudflare-d1",
+    "cloudflare-r2"
+  ],
+  "author": "Thầy Nghĩa",
+  "license": "MIT"
+}

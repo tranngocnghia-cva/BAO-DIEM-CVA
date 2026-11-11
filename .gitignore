@@ -1,0 +1,27 @@
+# Thư mục build và dependencies
+node_modules/
+.wrangler/
+dist/
+
+# Thư mục Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Cơ sở dữ liệu SQLite cục bộ (được sinh tự động từ script)
+data/*.sqlite
+data/*.sqlite-shm
+data/*.sqlite-wal
+
+# Biến môi trường
+.env
+.env.local
+
+# Các thư mục chứa 1.341 file PDF gốc (813 MB)
+# Lưu ý: Toàn bộ file PDF được lưu trữ và phục vụ qua Cloudflare R2
+# Không commit 813MB vào Git để tránh vượt hạn mức 1GB của GitHub.
+AN-DONG/
+CHO-LON/
+*.pdf
+!sample*.pdf
