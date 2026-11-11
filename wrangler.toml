@@ -14,7 +14,7 @@ binding = "DB"
 database_name = "bao-diem-cva"
 database_id = "08a0e1fa-bbf0-4c2d-b511-952da6fea788"
 
-# Cấu hình Cloudflare R2 Bucket (Bật khi Thầy tạo bucket bao-diem-pdf trên Cloudflare)
-# [[r2_buckets]]
-# binding = "PDF_BUCKET"
-# bucket_name = "bao-diem-pdf"
+# Cấu hình Cloudflare R2 Bucket (Lưu trữ 1.341+ file PDF)
+[[r2_buckets]]
+binding = "PDF_BUCKET"
+bucket_name = "bao-diem-pdf"
