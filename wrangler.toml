@@ -11,8 +11,8 @@ fallthrough = true
 # Cấu hình Cloudflare D1 Database (Serverless SQLite)
 [[d1_databases]]
 binding = "DB"
-database_name = "bao_diem_db"
-database_id = "e2576172-1ea6-47e1-9ac9-33010cfa790a"
+database_name = "bao-diem-cva"
+database_id = "08a0e1fa-bbf0-4c2d-b511-952da6fea788"
 
 # Cấu hình Cloudflare R2 Bucket (Lưu trữ 1.341+ file PDF)
 [[r2_buckets]]
