@@ -57,4 +57,4 @@ Mở trình duyệt: `http://localhost:8787`
 Xem hướng dẫn chi tiết từng bước tại: [HUONG_DAN_TRIEN_KHAI.md](HUONG_DAN_TRIEN_KHAI.md)
 
 ---
-*Phát triển bởi Thầy Nghĩa • 2026*
+*Trường THPT Chu Văn An • Cổng Tra Cứu Điểm & Bài Thi Trực Tuyến*

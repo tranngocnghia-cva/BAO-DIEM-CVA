@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <title>Cổng Tra Cứu Điểm & Bài Thi Học Sinh - THPT Chu Văn An</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22%20width=%22100%22%20height=%22100%22><text y=%22.9em%22 font-size=%2290%22>🎓</text></svg>">
   
@@ -12,6 +12,9 @@
     tailwind.config = {
       theme: {
         extend: {
+          screens: {
+            'xs': '420px',
+          },
           colors: {
             brand: {
               50: '#eff6ff',
@@ -33,85 +36,115 @@
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    html, body {
+      overflow-x: hidden;
+      width: 100%;
+      min-height: 100%;
+    }
     body {
       font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    button, a, input {
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .scrollbar-none::-webkit-scrollbar {
+      display: none;
+    }
+    .scrollbar-none {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
     }
     [v-cloak] { display: none; }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+      animation: fadeIn 0.25s ease-out forwards;
+    }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased selection:bg-blue-600 selection:text-white">
 
-  <div id="app" v-cloak class="flex flex-col min-h-screen">
+  <div id="app" v-cloak class="flex flex-col min-h-screen w-full">
+    
     <!-- HEADER -->
-    <header class="bg-gradient-to-r from-blue-900 via-indigo-900 to-blue-950 text-white shadow-lg border-b border-blue-800">
-      <div class="max-w-5xl mx-auto px-4 py-5 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div class="flex items-center gap-4 text-center sm:text-left">
-          <div class="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center text-3xl shadow-inner">
+    <header class="bg-gradient-to-r from-blue-900 via-indigo-900 to-blue-950 text-white shadow-md border-b border-blue-800/80 sticky top-0 z-40">
+      <div class="max-w-6xl mx-auto px-3.5 sm:px-6 py-3.5 sm:py-4 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5 sm:gap-4 min-w-0">
+          <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center text-xl sm:text-2xl shadow-inner shrink-0">
             🎓
           </div>
-          <div>
-            <div class="text-xs font-semibold uppercase tracking-wider text-blue-200">Trường THPT Chu Văn An</div>
-            <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight">Cổng Tra Cứu Kết Quả & Bài Thi</h1>
-            <div class="text-xs text-blue-300 mt-0.5">Hệ thống báo điểm & xem bài thi trực tuyến đa môn học</div>
+          <div class="min-w-0">
+            <div class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-blue-200 truncate">Trường THPT Chu Văn An</div>
+            <h1 class="text-sm sm:text-lg md:text-xl font-extrabold tracking-tight truncate">Cổng Tra Cứu Kết Quả & Bài Thi</h1>
+            <div class="text-[10px] sm:text-xs text-blue-300 hidden xs:block truncate">Tra cứu điểm thi và xem bài làm trực tuyến</div>
           </div>
         </div>
-        <div class="flex items-center gap-2">
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-200 border border-blue-400/30">
+        <div class="flex items-center gap-2 shrink-0">
+          <span class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-medium bg-blue-500/20 text-blue-200 border border-blue-400/30 whitespace-nowrap">
             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            Năm học 2026 - 2027
+            <span class="hidden sm:inline">Năm học</span> 2026 - 2027
           </span>
         </div>
       </div>
     </header>
 
     <!-- MAIN CONTENT -->
-    <main class="flex-grow max-w-5xl w-full mx-auto px-4 py-8 sm:px-6">
+    <main class="flex-grow max-w-6xl w-full mx-auto px-3 sm:px-6 py-4 sm:py-8">
 
       <!-- TRA CỨU / ĐĂNG NHẬP CARD (KHI CHƯA TRA CỨU HOẶC MUỐN TÌM LẠI) -->
-      <section v-if="!studentData" class="max-w-2xl mx-auto">
-        <div class="bg-white rounded-3xl shadow-xl border border-slate-200/80 overflow-hidden">
+      <section v-if="!studentData" class="max-w-xl mx-auto w-full my-auto animate-fade-in">
+        <div class="bg-white rounded-2xl sm:rounded-3xl shadow-xl border border-slate-200/90 overflow-hidden">
           
           <!-- TIÊU ĐỀ CARD -->
-          <div class="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-5 text-white">
-            <h2 class="text-lg sm:text-xl font-bold flex items-center gap-2">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-              Cổng Tra Cứu Điểm & Bài Thi Trực Tuyến
+          <div class="bg-gradient-to-r from-blue-600 to-indigo-600 px-5 sm:px-7 py-4 sm:py-5 text-white">
+            <h2 class="text-base sm:text-xl font-bold flex items-center gap-2">
+              <svg class="w-5 h-5 sm:w-6 sm:h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+              <span>Tra Cứu Điểm & Bài Thi Trực Tuyến</span>
             </h2>
-            <p class="text-xs sm:text-sm text-blue-100 mt-1">Học sinh có thể tra cứu nhanh bằng Mã số học sinh hoặc đăng nhập bằng Email trường.</p>
+            <p class="text-xs sm:text-sm text-blue-100 mt-1 leading-relaxed">Học sinh có thể tra cứu nhanh bằng Mã số học sinh hoặc đăng nhập bằng Email trường.</p>
           </div>
 
           <!-- TAB CHỌN PHƯƠNG THỨC XÁC THỰC -->
-          <div class="p-3 bg-slate-100/80 border-b border-slate-200">
-            <div class="grid grid-cols-2 gap-2 bg-slate-200/60 p-1.5 rounded-2xl">
+          <div class="p-2 sm:p-3 bg-slate-100/90 border-b border-slate-200">
+            <div class="grid grid-cols-2 gap-1.5 sm:gap-2 bg-slate-200/70 p-1 sm:p-1.5 rounded-xl sm:rounded-2xl">
               <button
                 type="button"
                 @click="switchAuthMethod('mshs')"
                 :class="authMethod === 'mshs' ? 'bg-white text-blue-700 font-bold shadow-sm' : 'text-slate-600 hover:text-slate-900 font-medium'"
-                class="py-2.5 px-3 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
+                class="py-2 sm:py-2.5 px-2 rounded-lg sm:rounded-xl text-xs sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 transition-all cursor-pointer text-center"
               >
                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"></path></svg>
-                <span>MSHS & Ngày sinh</span>
+                <span class="truncate">MSHS & Ngày sinh</span>
               </button>
               <button
                 type="button"
                 @click="switchAuthMethod('email')"
                 :class="authMethod === 'email' ? 'bg-white text-blue-700 font-bold shadow-sm' : 'text-slate-600 hover:text-slate-900 font-medium'"
-                class="py-2.5 px-3 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
+                class="py-2 sm:py-2.5 px-2 rounded-lg sm:rounded-xl text-xs sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 transition-all cursor-pointer text-center"
               >
                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                <span>Email trường & Mật khẩu</span>
+                <span class="truncate">Email trường & Mật khẩu</span>
               </button>
             </div>
           </div>
 
           <!-- FORM TRA CỨU / ĐĂNG NHẬP -->
-          <form @submit.prevent="handleLookup" class="p-6 sm:p-8 space-y-6">
+          <form @submit.prevent="handleLookup" class="p-4 sm:p-7 space-y-5 sm:space-y-6">
 
             <!-- ======================= TAB 1: MSHS + NGÀY SINH ======================= -->
-            <div v-if="authMethod === 'mshs'" class="space-y-5">
+            <div v-if="authMethod === 'mshs'" class="space-y-4 sm:space-y-5">
               <!-- Mã số học sinh -->
               <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-2">
+                <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">
                   Mã số học sinh (MSHS) / Số báo danh
                   <span class="text-red-500">*</span>
                 </label>
@@ -120,7 +153,7 @@
                     type="text"
                     v-model="searchForm.studentId"
                     placeholder="Ví dụ: 10000001 hoặc A0000160"
-                    class="w-full px-4 py-3.5 rounded-xl border border-slate-300 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all uppercase font-medium text-slate-800 placeholder-slate-400"
+                    class="w-full px-3.5 sm:px-4 py-3 sm:py-3.5 rounded-xl border border-slate-300 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all uppercase font-medium text-slate-800 placeholder-slate-400 text-base"
                     :required="authMethod === 'mshs'"
                     autocomplete="off"
                   >
@@ -128,12 +161,12 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                   </div>
                 </div>
-                <p class="text-xs text-slate-500 mt-1.5">Nhập mã học sinh được cấp (có thể bắt đầu bằng số hoặc chữ A).</p>
+                <p class="text-[11px] sm:text-xs text-slate-500 mt-1.5">Nhập mã học sinh được cấp (có thể bắt đầu bằng số hoặc chữ A).</p>
               </div>
 
               <!-- Ngày tháng năm sinh -->
               <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-2">
+                <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">
                   Ngày tháng năm sinh
                   <span class="text-red-500">*</span>
                 </label>
@@ -144,7 +177,7 @@
                     @input="formatDobInput"
                     placeholder="DD/MM/YYYY (Ví dụ: 14/04/2011)"
                     maxlength="10"
-                    class="w-full px-4 py-3.5 rounded-xl border border-slate-300 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all font-medium text-slate-800 placeholder-slate-400"
+                    class="w-full px-3.5 sm:px-4 py-3 sm:py-3.5 rounded-xl border border-slate-300 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all font-medium text-slate-800 placeholder-slate-400 text-base"
                     :required="authMethod === 'mshs'"
                     autocomplete="off"
                   >
@@ -152,16 +185,16 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                   </div>
                 </div>
-                <p class="text-xs text-slate-500 mt-1.5">Định dạng ngày/tháng/năm (hệ thống tự động thêm dấu / khi gõ).</p>
+                <p class="text-[11px] sm:text-xs text-slate-500 mt-1.5">Định dạng ngày/tháng/năm (hệ thống tự động thêm dấu / khi gõ).</p>
               </div>
             </div>
 
             <!-- ======================= TAB 2: EMAIL TRƯỜNG + MẬT KHẨU ======================= -->
-            <div v-else class="space-y-5">
+            <div v-else class="space-y-4 sm:space-y-5">
               <!-- Email hoặc Số tài khoản -->
               <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-2">
-                  Email trường Google Workspace hoặc Số tài khoản
+                <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">
+                  Email trường hoặc Số tài khoản Google
                   <span class="text-red-500">*</span>
                 </label>
                 <div class="relative">
@@ -169,7 +202,7 @@
                     type="text"
                     v-model="emailForm.email"
                     placeholder="Ví dụ: 24001@ttgdtxcva.edu.vn hoặc 24001"
-                    class="w-full px-4 py-3.5 rounded-xl border border-slate-300 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all font-medium text-slate-800 placeholder-slate-400"
+                    class="w-full px-3.5 sm:px-4 py-3 sm:py-3.5 rounded-xl border border-slate-300 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all font-medium text-slate-800 placeholder-slate-400 text-base"
                     :required="authMethod === 'email'"
                     autocomplete="username"
                   >
@@ -177,12 +210,12 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path></svg>
                   </div>
                 </div>
-                <p class="text-xs text-slate-500 mt-1.5">Có thể nhập đầy đủ <strong class="text-slate-700">email @ttgdtxcva.edu.vn</strong> hoặc chỉ cần gõ <strong class="text-slate-700">mã tài khoản</strong> (ví dụ 24001, 26040).</p>
+                <p class="text-[11px] sm:text-xs text-slate-500 mt-1.5">Có thể nhập đầy đủ <strong class="text-slate-700">email @ttgdtxcva.edu.vn</strong> hoặc chỉ cần gõ <strong class="text-slate-700">mã tài khoản</strong> (ví dụ 24001, 26040).</p>
               </div>
 
               <!-- Mật khẩu -->
               <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-2">
+                <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">
                   Mật khẩu đăng nhập
                   <span class="text-red-500">*</span>
                 </label>
@@ -191,32 +224,33 @@
                     :type="emailForm.showPassword ? 'text' : 'password'"
                     v-model="emailForm.password"
                     placeholder="Nhập mật khẩu (Mặc định: Ngày sinh ddmmyyyy)"
-                    class="w-full px-4 py-3.5 rounded-xl border border-slate-300 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all font-medium text-slate-800 placeholder-slate-400"
+                    class="w-full px-3.5 sm:px-4 py-3 sm:py-3.5 rounded-xl border border-slate-300 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all font-medium text-slate-800 placeholder-slate-400 text-base pr-12"
                     :required="authMethod === 'email'"
                     autocomplete="current-password"
                   >
                   <button
                     type="button"
                     @click="emailForm.showPassword = !emailForm.showPassword"
-                    class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 hover:text-slate-600 cursor-pointer"
+                    class="absolute inset-y-0 right-0 flex items-center px-3.5 text-slate-400 hover:text-slate-600 cursor-pointer min-w-[44px] justify-center"
+                    aria-label="Ẩn hiện mật khẩu"
                   >
                     <svg v-if="!emailForm.showPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                     <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"></path></svg>
                   </button>
                 </div>
-                <p class="text-xs text-blue-600 mt-1.5 flex items-center gap-1">
-                  <span>💡</span>
+                <p class="text-[11px] sm:text-xs text-blue-600 mt-1.5 flex items-start gap-1">
+                  <span class="shrink-0 mt-0.5">💡</span>
                   <span>Mật khẩu mặc định là Ngày tháng năm sinh (ví dụ sinh 27/02/2009 gõ <strong class="font-bold">27022009</strong> hoặc <strong class="font-bold">27/02/2009</strong>).</span>
                 </p>
               </div>
             </div>
 
             <!-- THÔNG BÁO LỖI -->
-            <div v-if="errorMessage" class="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm flex items-start gap-3 animate-fade-in">
+            <div v-if="errorMessage" class="p-3.5 sm:p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs sm:text-sm flex items-start gap-2.5 sm:gap-3 animate-fade-in">
               <svg class="w-5 h-5 text-red-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
               <div>
                 <div class="font-semibold">{{ authMethod === 'mshs' ? 'Tra cứu không thành công' : 'Đăng nhập không thành công' }}</div>
-                <div class="text-xs mt-0.5">{{ errorMessage }}</div>
+                <div class="text-[11px] sm:text-xs mt-0.5">{{ errorMessage }}</div>
               </div>
             </div>
 
@@ -224,9 +258,9 @@
             <button
               type="submit"
               :disabled="isLoading"
-              class="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-base shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+              class="w-full py-3.5 sm:py-4 px-4 sm:px-6 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-sm sm:text-base shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
             >
-              <svg v-if="isLoading" class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+              <svg v-if="isLoading" class="animate-spin -ml-1 mr-2 h-5 w-5 text-white shrink-0" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
@@ -235,68 +269,68 @@
           </form>
 
           <!-- HƯỚNG DẪN DƯỚI FORM -->
-          <div class="bg-slate-50 border-t border-slate-100 p-5 text-xs text-slate-500 space-y-1">
+          <div class="bg-slate-50 border-t border-slate-100 p-4 sm:p-5 text-[11px] sm:text-xs text-slate-500 space-y-1">
             <div class="font-semibold text-slate-600 flex items-center gap-1.5">
               <span>💡</span> Lưu ý dành cho học sinh:
             </div>
             <div>• Cả 2 phương thức đều dẫn đến cùng một bảng điểm chính thức và file PDF bài thi gốc đã chấm.</div>
-            <div>• Học sinh có thể dùng bất kỳ phương thức nào tiện lợi nhất. Nếu gặp sự cố, xin vui lòng liên hệ Thầy Nghĩa hoặc GVCN.</div>
+            <div>• Học sinh có thể dùng bất kỳ phương thức nào tiện lợi nhất. Nếu gặp sự cố, xin vui lòng liên hệ văn phòng nhà trường hoặc giáo viên chủ nhiệm.</div>
           </div>
         </div>
       </section>
 
       <!-- KẾT QUẢ TRA CỨU (KHI ĐÃ TÌM THẤY HỌC SINH) -->
-      <section v-else class="space-y-6">
+      <section v-else class="space-y-4 sm:space-y-6 animate-fade-in">
 
         <!-- THÔNG TIN HỌC SINH (BANNER) -->
-        <div class="bg-white rounded-3xl shadow-sm border border-slate-200/90 p-5 sm:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div class="flex items-center gap-4">
-            <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-extrabold text-2xl flex items-center justify-center shadow-md">
+        <div class="bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-slate-200/90 p-4 sm:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div class="flex items-start sm:items-center gap-3.5 sm:gap-4 min-w-0 w-full md:w-auto">
+            <div class="w-13 h-13 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-extrabold text-xl sm:text-2xl flex items-center justify-center shadow-md shrink-0">
               {{ getInitials(studentData.full_name) }}
             </div>
-            <div>
-              <div class="flex items-center gap-2 flex-wrap">
-                <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 uppercase tracking-tight">
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                <h2 class="text-lg sm:text-2xl font-extrabold text-slate-900 uppercase tracking-tight break-words">
                   {{ studentData.full_name }}
                 </h2>
-                <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 whitespace-nowrap">
                   Lớp {{ studentData.class_name }}
                 </span>
-                <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold"
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap"
                       :class="studentData.campus === 'CHO-LON' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'">
                   {{ studentData.campus === 'CHO-LON' ? 'Phân hiệu Chợ Lớn' : 'Cơ sở An Đông' }}
                 </span>
-                <span v-if="studentData.email" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-200">
-                  <svg class="w-3.5 h-3.5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                  {{ studentData.email }}
-                </span>
               </div>
               <div class="text-xs sm:text-sm text-slate-500 mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1">
-                <span>Mã số HS: <strong class="text-slate-700">{{ studentData.student_id }}</strong></span>
-                <span>Ngày sinh: <strong class="text-slate-700">{{ studentData.dob }}</strong></span>
-                <span v-if="studentData.gender">Giới tính: <strong class="text-slate-700">{{ studentData.gender }}</strong></span>
+                <span>MSHS: <strong class="text-slate-700 font-semibold">{{ studentData.student_id }}</strong></span>
+                <span>Ngày sinh: <strong class="text-slate-700 font-semibold">{{ studentData.dob }}</strong></span>
+                <span v-if="studentData.gender">Giới tính: <strong class="text-slate-700 font-semibold">{{ studentData.gender }}</strong></span>
+                <span v-if="studentData.email" class="inline-flex items-center gap-1 text-blue-600">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                  <strong>{{ studentData.email }}</strong>
+                </span>
               </div>
             </div>
           </div>
 
           <button
             @click="resetLookup"
-            class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100 text-sm font-semibold transition-all flex items-center gap-2 shrink-0 self-end md:self-auto cursor-pointer"
+            class="w-full md:w-auto px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100 text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer self-stretch md:self-auto"
           >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-            Tra cứu học sinh khác
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            <span>Tra cứu học sinh khác</span>
           </button>
         </div>
 
         <!-- THANH CHỌN MÔN HỌC (SUBJECT SELECTOR) - HỖ TRỢ ĐA MÔN HỌC -->
-        <div class="flex items-center gap-2 overflow-x-auto pb-1 border-b border-slate-200">
+        <div class="flex items-center gap-2 overflow-x-auto pb-2 pt-1 border-b border-slate-200 scrollbar-none -mx-3 px-3 sm:mx-0 sm:px-0">
           <button
             v-for="sub in scoreList"
             :key="sub.id"
             @click="selectedSubjectId = sub.subject_id"
-            class="px-5 py-3 rounded-2xl font-bold text-sm transition-all flex items-center gap-2 shrink-0"
+            class="px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm transition-all flex items-center gap-2 shrink-0 cursor-pointer shadow-sm"
             :class="selectedSubjectId === sub.subject_id
-              ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30'
+              ? 'bg-blue-600 text-white shadow-blue-500/30'
               : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'"
           >
             <span>📚 {{ sub.subject_name }}</span>
@@ -311,64 +345,76 @@
         </div>
 
         <!-- CHI TIẾT ĐIỂM SỐ CỦA MÔN ĐƯỢC CHỌN -->
-        <div v-if="currentScore" class="space-y-6">
-          <div class="bg-white rounded-3xl shadow-sm border border-slate-200/90 p-6 sm:p-8">
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
-              <div>
-                <div class="text-xs font-bold uppercase tracking-wider text-blue-600">{{ currentScore.exam_title }}</div>
-                <h3 class="text-2xl font-extrabold text-slate-900 mt-0.5">
+        <div v-if="currentScore" class="space-y-4 sm:space-y-6">
+          <div class="bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-slate-200/90 p-5 sm:p-8">
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-5 sm:pb-6 border-b border-slate-100">
+              <div class="min-w-0 flex-1">
+                <div class="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-blue-600">{{ currentScore.exam_title }}</div>
+                <h3 class="text-xl sm:text-2xl font-extrabold text-slate-900 mt-0.5 truncate">
                   Môn: {{ currentScore.subject_name }}
                 </h3>
-                <div class="text-xs text-slate-500 mt-1 flex items-center gap-3">
-                  <span v-if="currentScore.exam_code">Mã đề: <strong>{{ currentScore.exam_code }}</strong></span>
-                  <span v-if="currentScore.total_questions > 0">Số câu đúng: <strong>{{ currentScore.correct_count }} / {{ currentScore.total_questions }} câu</strong></span>
+                <div class="text-xs text-slate-500 mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
+                  <span v-if="currentScore.exam_code">Mã đề: <strong class="text-slate-700">{{ currentScore.exam_code }}</strong></span>
+                  <span v-if="currentScore.total_questions > 0">Số câu đúng: <strong class="text-slate-700">{{ currentScore.correct_count }} / {{ currentScore.total_questions }} câu</strong></span>
                 </div>
               </div>
 
               <!-- ĐIỂM TỔNG KẾT VÀ XẾP LOẠI -->
-              <div class="flex items-center gap-4 bg-slate-50 border border-slate-200/70 rounded-2xl px-5 py-3.5">
-                <div class="text-right">
-                  <div class="text-xs font-semibold text-slate-500 uppercase">Điểm Tổng Kết</div>
-                  <div class="text-xs font-bold" :class="getRatingColor(currentScore.total_score)">
+              <div class="flex items-center justify-between sm:justify-end gap-4 bg-slate-50 border border-slate-200/70 rounded-2xl px-5 py-3 w-full md:w-auto shrink-0">
+                <div class="text-left sm:text-right">
+                  <div class="text-[10px] sm:text-xs font-semibold text-slate-500 uppercase tracking-wide">Điểm Tổng Kết</div>
+                  <div class="text-xs sm:text-sm font-bold" :class="getRatingColor(currentScore.total_score)">
                     {{ getRatingText(currentScore.total_score) }}
                   </div>
                 </div>
-                <div class="text-4xl sm:text-5xl font-black" :class="getScoreColor(currentScore.total_score)">
+                <div class="text-4xl sm:text-5xl font-black tracking-tight" :class="getScoreColor(currentScore.total_score)">
                   {{ currentScore.total_score >= 0 ? currentScore.total_score.toFixed(2).replace(/\.00$/, '') : 'Vắng' }}
                 </div>
               </div>
             </div>
 
             <!-- PHÂN TÍCH ĐIỂM THEO CẤU TRÚC 3 PHẦN BỘ GIÁO DỤC -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 pt-5 sm:pt-6">
               <!-- Phần I -->
-              <div class="bg-gradient-to-br from-blue-50/60 to-white p-5 rounded-2xl border border-blue-100/80">
-                <div class="text-xs font-semibold text-blue-800 uppercase tracking-wide">Phần I</div>
-                <div class="text-sm font-bold text-slate-800 mt-0.5">Trắc nghiệm nhiều lựa chọn</div>
-                <div class="text-2xl font-extrabold text-blue-700 mt-2">
-                  {{ currentScore.part1_score !== null ? currentScore.part1_score : '-' }} <span class="text-xs font-normal text-slate-500">điểm</span>
+              <div class="bg-gradient-to-br from-blue-50/60 to-white p-4 sm:p-5 rounded-2xl border border-blue-100/80 flex flex-col justify-between">
+                <div>
+                  <div class="text-xs font-semibold text-blue-800 uppercase tracking-wide">Phần I</div>
+                  <div class="text-sm font-bold text-slate-800 mt-0.5">Trắc nghiệm nhiều lựa chọn</div>
                 </div>
-                <div class="text-[11px] text-slate-400 mt-1">4 phương án chọn 1</div>
+                <div class="mt-3">
+                  <div class="text-2xl font-extrabold text-blue-700">
+                    {{ currentScore.part1_score !== null ? currentScore.part1_score : '-' }} <span class="text-xs font-normal text-slate-500">điểm</span>
+                  </div>
+                  <div class="text-[11px] text-slate-400 mt-0.5">4 phương án chọn 1</div>
+                </div>
               </div>
 
               <!-- Phần II -->
-              <div class="bg-gradient-to-br from-indigo-50/60 to-white p-5 rounded-2xl border border-indigo-100/80">
-                <div class="text-xs font-semibold text-indigo-800 uppercase tracking-wide">Phần II</div>
-                <div class="text-sm font-bold text-slate-800 mt-0.5">Trắc nghiệm Đúng / Sai</div>
-                <div class="text-2xl font-extrabold text-indigo-700 mt-2">
-                  {{ currentScore.part2_score !== null ? currentScore.part2_score : '-' }} <span class="text-xs font-normal text-slate-500">điểm</span>
+              <div class="bg-gradient-to-br from-indigo-50/60 to-white p-4 sm:p-5 rounded-2xl border border-indigo-100/80 flex flex-col justify-between">
+                <div>
+                  <div class="text-xs font-semibold text-indigo-800 uppercase tracking-wide">Phần II</div>
+                  <div class="text-sm font-bold text-slate-800 mt-0.5">Trắc nghiệm Đúng / Sai</div>
                 </div>
-                <div class="text-[11px] text-slate-400 mt-1">4 ý mỗi câu hỏi</div>
+                <div class="mt-3">
+                  <div class="text-2xl font-extrabold text-indigo-700">
+                    {{ currentScore.part2_score !== null ? currentScore.part2_score : '-' }} <span class="text-xs font-normal text-slate-500">điểm</span>
+                  </div>
+                  <div class="text-[11px] text-slate-400 mt-0.5">4 ý mỗi câu hỏi</div>
+                </div>
               </div>
 
               <!-- Phần III -->
-              <div class="bg-gradient-to-br from-emerald-50/60 to-white p-5 rounded-2xl border border-emerald-100/80">
-                <div class="text-xs font-semibold text-emerald-800 uppercase tracking-wide">Phần III</div>
-                <div class="text-sm font-bold text-slate-800 mt-0.5">Câu hỏi Trả lời ngắn</div>
-                <div class="text-2xl font-extrabold text-emerald-700 mt-2">
-                  {{ currentScore.part3_score !== null ? currentScore.part3_score : '-' }} <span class="text-xs font-normal text-slate-500">điểm</span>
+              <div class="bg-gradient-to-br from-emerald-50/60 to-white p-4 sm:p-5 rounded-2xl border border-emerald-100/80 flex flex-col justify-between">
+                <div>
+                  <div class="text-xs font-semibold text-emerald-800 uppercase tracking-wide">Phần III</div>
+                  <div class="text-sm font-bold text-slate-800 mt-0.5">Câu hỏi Trả lời ngắn</div>
                 </div>
-                <div class="text-[11px] text-slate-400 mt-1">Điền đáp án số</div>
+                <div class="mt-3">
+                  <div class="text-2xl font-extrabold text-emerald-700">
+                    {{ currentScore.part3_score !== null ? currentScore.part3_score : '-' }} <span class="text-xs font-normal text-slate-500">điểm</span>
+                  </div>
+                  <div class="text-[11px] text-slate-400 mt-0.5">Điền đáp án số</div>
+                </div>
               </div>
             </div>
 
@@ -381,63 +427,82 @@
           </div>
 
           <!-- KHUNG XEM BÀI THI PDF ĐÃ CHẤM -->
-          <div class="bg-white rounded-3xl shadow-sm border border-slate-200/90 overflow-hidden">
-            <div class="bg-slate-100 px-6 py-4 border-b border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              <div class="flex items-center gap-2">
-                <span class="text-xl">📄</span>
-                <div>
-                  <h4 class="font-bold text-slate-900 text-sm sm:text-base">File Bài Thi Đã Chấm (Bản Quét)</h4>
-                  <p class="text-xs text-slate-500">Xem trực tiếp các câu đúng/sai được chấm trên bài làm</p>
+          <div class="bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-slate-200/90 overflow-hidden">
+            <div class="bg-slate-100 px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span class="text-xl shrink-0">📄</span>
+                <div class="min-w-0">
+                  <h4 class="font-bold text-slate-900 text-sm sm:text-base truncate">File Bài Thi Đã Chấm (Bản Quét)</h4>
+                  <p class="text-[11px] sm:text-xs text-slate-500 truncate">Xem trực tiếp các câu đúng/sai được chấm trên bài làm</p>
                 </div>
               </div>
 
               <!-- NÚT THAO TÁC VỚI PDF -->
-              <div v-if="currentScore.pdf_url" class="flex items-center gap-2 w-full sm:w-auto">
+              <div v-if="currentScore.pdf_url" class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                <button
+                  type="button"
+                  @click="isFullscreenPdf = true"
+                  class="flex-1 sm:flex-none px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                  title="Phóng to toàn màn hình bài thi"
+                >
+                  <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
+                  <span class="whitespace-nowrap">Toàn màn hình</span>
+                </button>
                 <a
                   :href="currentScore.pdf_url"
                   target="_blank"
-                  class="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold text-xs shadow-sm transition-all flex items-center justify-center gap-1.5"
+                  class="flex-1 sm:flex-none px-3.5 py-2 rounded-xl bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold text-xs shadow-sm transition-all flex items-center justify-center gap-1.5"
+                  title="Mở tab mới"
                 >
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                  Mở tab mới
+                  <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                  <span class="whitespace-nowrap">Mở tab mới</span>
                 </a>
                 <a
                   :href="currentScore.pdf_url"
                   :download="`BaiThi_${currentScore.subject_code}_${studentData.student_id}.pdf`"
-                  class="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-sm transition-all flex items-center justify-center gap-1.5"
+                  class="flex-1 sm:flex-none px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-sm transition-all flex items-center justify-center gap-1.5"
+                  title="Tải file PDF bài thi"
                 >
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                  Tải PDF
+                  <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                  <span class="whitespace-nowrap">Tải PDF</span>
                 </a>
               </div>
             </div>
 
             <!-- NỘI DUNG PDF HOẶC THÔNG BÁO -->
-            <div class="p-4 sm:p-6 bg-slate-200/50">
+            <div class="p-3 sm:p-6 bg-slate-200/50">
               <div v-if="currentScore.pdf_url" class="w-full">
-                <!-- Viewer iframe cho máy tính và tablet -->
-                <div class="rounded-2xl overflow-hidden border border-slate-300 shadow-md bg-white">
+                <!-- Viewer iframe thích ứng linh hoạt mọi tỉ lệ màn hình -->
+                <div class="rounded-xl sm:rounded-2xl overflow-hidden border border-slate-300 shadow-md bg-white">
                   <iframe
                     :src="currentScore.pdf_url"
-                    class="w-full h-[650px] sm:h-[750px] border-none"
+                    class="w-full h-[55vh] min-h-[440px] sm:h-[70vh] sm:min-h-[650px] lg:h-[78vh] lg:min-h-[720px] border-none"
                     title="Bài thi học sinh"
                   ></iframe>
                 </div>
+                
                 <!-- Nút hỗ trợ xem trên điện thoại -->
-                <div class="mt-3 text-center sm:hidden">
+                <div class="mt-3 text-center sm:hidden flex flex-col gap-2">
+                  <button
+                    type="button"
+                    @click="isFullscreenPdf = true"
+                    class="w-full py-3 rounded-xl bg-slate-900 text-white font-bold text-xs shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <span>🔍</span> Phóng to toàn màn hình bài thi
+                  </button>
                   <a
                     :href="currentScore.pdf_url"
                     target="_blank"
-                    class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-blue-600 text-white font-bold text-sm shadow-md"
+                    class="w-full py-2.5 rounded-xl bg-white border border-slate-300 text-slate-700 font-semibold text-xs shadow-sm flex items-center justify-center gap-2"
                   >
-                    🔍 Xem toàn màn hình bài thi trên điện thoại
+                    <span>↗️</span> Mở trong tab mới (xem bằng trình đọc PDF của máy)
                   </a>
                 </div>
               </div>
 
               <!-- THÔNG BÁO NẾU KHÔNG CÓ FILE PDF (VÍ DỤ VẮNG THI) -->
-              <div v-else class="text-center py-16 px-4">
-                <div class="w-16 h-16 rounded-full bg-slate-200 text-slate-400 mx-auto flex items-center justify-center text-3xl mb-3">
+              <div v-else class="text-center py-12 sm:py-16 px-4">
+                <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-slate-200 text-slate-400 mx-auto flex items-center justify-center text-2xl sm:text-3xl mb-3">
                   📂
                 </div>
                 <h5 class="text-base font-bold text-slate-700">Chưa có file bài thi trực tuyến</h5>
@@ -453,11 +518,61 @@
 
     </main>
 
-    <!-- FOOTER -->
+    <!-- MODAL XEM TOÀN MÀN HÌNH BÀI THI PDF -->
+    <div v-if="isFullscreenPdf && currentScore && currentScore.pdf_url"
+         class="fixed inset-0 z-50 bg-black/90 flex flex-col animate-fade-in backdrop-blur-sm">
+      <!-- Thanh công cụ Fullscreen -->
+      <div class="bg-slate-900/95 text-white px-4 py-3 flex items-center justify-between border-b border-slate-800 gap-3 shrink-0">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <span class="text-xl shrink-0">📄</span>
+          <div class="min-w-0">
+            <h4 class="font-bold text-sm sm:text-base truncate">{{ studentData.full_name }} • {{ currentScore.subject_name }}</h4>
+            <p class="text-xs text-slate-400 truncate">Lớp: {{ studentData.class_name }} | Điểm: {{ currentScore.total_score }}đ</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <a
+            :href="currentScore.pdf_url"
+            target="_blank"
+            class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 flex items-center gap-1.5 transition-all"
+            title="Mở trong tab mới"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+            <span class="hidden sm:inline">Mở tab mới</span>
+          </a>
+          <a
+            :href="currentScore.pdf_url"
+            :download="`BaiThi_${currentScore.subject_code}_${studentData.student_id}.pdf`"
+            class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-xs font-semibold text-white flex items-center gap-1.5 transition-all"
+            title="Tải bài thi"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+            <span class="hidden sm:inline">Tải PDF</span>
+          </a>
+          <button
+            type="button"
+            @click="isFullscreenPdf = false"
+            class="px-3.5 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-xs font-bold text-white flex items-center gap-1 transition-all cursor-pointer"
+          >
+            ✕ <span>Đóng</span>
+          </button>
+        </div>
+      </div>
+      <!-- Iframe Fullscreen -->
+      <div class="flex-grow w-full h-[calc(100vh-56px)] bg-slate-800 overflow-hidden">
+        <iframe
+          :src="currentScore.pdf_url"
+          class="w-full h-full border-none"
+          title="Toàn màn hình bài thi"
+        ></iframe>
+      </div>
+    </div>
+
+    <!-- FOOTER CHÍNH THỨC TRƯỜNG THPT CHU VĂN AN -->
     <footer class="mt-auto bg-slate-900 text-slate-400 py-6 text-center text-xs border-t border-slate-800">
-      <div class="max-w-5xl mx-auto px-4 space-y-1">
-        <p class="font-medium text-slate-300">TRƯỜNG THPT CHU VĂN AN - HỆ THỐNG TRA CỨU ĐIỂM THI & BÀI LÀM TRỰC TUYẾN</p>
-        <p>Phát triển bởi Thầy Nghĩa • Hỗ trợ đa môn học & triển khai Cloudflare Serverless</p>
+      <div class="max-w-6xl mx-auto px-4 space-y-1.5">
+        <p class="font-bold text-slate-200 uppercase tracking-wide">TRƯỜNG THPT CHU VĂN AN • TP. HỒ CHÍ MINH</p>
+        <p class="text-slate-400">Cơ sở An Đông & Phân hiệu Chợ Lớn • Cổng Tra Cứu Kết Quả & Bài Thi Trực Tuyến</p>
       </div>
     </footer>
   </div>
@@ -480,6 +595,8 @@
           password: '',
           showPassword: false
         });
+
+        const isFullscreenPdf = ref(false);
 
         const switchAuthMethod = (method) => {
           authMethod.value = method;
@@ -580,6 +697,7 @@
           selectedSubjectId.value = null;
           errorMessage.value = '';
           emailForm.value.password = '';
+          isFullscreenPdf.value = false;
         };
 
         const getInitials = (name) => {
@@ -614,8 +732,17 @@
           return 'Cần cố gắng';
         };
 
+        // Đóng toàn màn hình bằng phím Escape
+        const handleKeydown = (e) => {
+          if (e.key === 'Escape' && isFullscreenPdf.value) {
+            isFullscreenPdf.value = false;
+          }
+        };
+
         // Hỗ trợ URL params: ?sbd=10000001&dob=14/04/2011 hoặc ?email=24001&pwd=...
         onMounted(() => {
+          window.addEventListener('keydown', handleKeydown);
+
           const urlParams = new URLSearchParams(window.location.search);
           const email = urlParams.get('email');
           const pwd = urlParams.get('pwd') || urlParams.get('pass');
@@ -639,6 +766,7 @@
           authMethod,
           searchForm,
           emailForm,
+          isFullscreenPdf,
           switchAuthMethod,
           isLoading,
           errorMessage,
