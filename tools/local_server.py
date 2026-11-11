@@ -54,11 +54,10 @@ def normalize_dob(dob_str):
 
 def verify_student_password(student, password):
     """
-    Xác thực mật khẩu học sinh:
+    Xác thực mật khẩu học sinh (Tuyệt đối không dùng mật khẩu chung):
     1. So sánh với password_hash (SHA-256 hoặc plaintext)
     2. So sánh với Ngày sinh ddmmyyyy (vd: 27022009) hoặc dd/mm/yyyy (vd: 27/02/2009)
     3. So sánh với account_id hoặc student_id
-    4. Mật khẩu mặc định hệ thống: cva@123, cva123, 123456
     """
     if not password:
         return False
@@ -84,10 +83,6 @@ def verify_student_password(student, password):
     if acc_id and pwd.lower() == acc_id.lower():
         return True
     if sid and pwd.upper() == sid.upper():
-        return True
-        
-    # 4. Mật khẩu khởi tạo phổ biến
-    if pwd.lower() in ["cva@123", "cva123", "123456", "cva2026"]:
         return True
         
     return False

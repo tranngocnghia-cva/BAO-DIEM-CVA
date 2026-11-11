@@ -210,21 +210,22 @@ def run_tests():
     except Exception as e:
         assert_test("Unified Form: 5 số MSHS (26040)", False, str(e))
 
-    # TEST 11: Unified Form: 5 số MSHS (24001) + Mật khẩu cva@123
+    # TEST 11: Bảo mật - Không có mật khẩu chung trường (cva@123 phải bị chặn)
     try:
         req = urllib.request.Request(
             f"{base_url}/api/lookup",
             data=json.dumps({"identifier": "24001", "secret": "cva@123"}).encode("utf-8"),
             headers={"Content-Type": "application/json"}
         )
-        with urllib.request.urlopen(req) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-            assert_test(
-                "Unified Form: 5 số MSHS (24001) + Mật khẩu cva@123",
-                data.get("success") is True and data["student"]["full_name"] == "MAI HỒNG AN"
-            )
-    except Exception as e:
-        assert_test("Unified Form: 5 số MSHS (24001) + Mật khẩu cva@123", False, str(e))
+        urllib.request.urlopen(req)
+        assert_test("Chặn mật khẩu chung của trường (cva@123)", False, "Đáng lẽ phải trả về lỗi 400")
+    except urllib.error.HTTPError as e:
+        err_data = json.loads(e.read().decode("utf-8"))
+        assert_test(
+            "Chặn mật khẩu chung của trường (cva@123)",
+            e.code == 400 and ("Thông tin xác thực" in err_data.get("error", "") or "không khớp" in err_data.get("error", "")),
+            f"Code: {e.code}, Data: {err_data}"
+        )
 
     # TEST 12: Đăng nhập với sai mật khẩu/ngày sinh -> Phải báo đúng lỗi 400
     try:

@@ -152,14 +152,14 @@ Hệ thống được thiết kế theo mô hình quan hệ linh hoạt:
 > **Lưu ý quan trọng**: 
 > - Học sinh **không cần chọn phương thức**: Giao diện chỉ có 2 ô nhập, máy chủ tự động nhận diện và đối chiếu.
 > - **MSHS chính thức** là **5 chữ số trong Email trường** (ví dụ: `26040`, `24001`). Hệ thống cũng hỗ trợ học sinh gõ email trường đầy đủ hoặc mã thi cũ.
-> - **Thông tin xác thực (Ô 2)**: Nhận mọi định dạng ngày sinh (`14/04/2011`, `14042011`) hoặc mật khẩu tài khoản (`cva@123`).
+> - **Bảo mật tuyệt đối**: **Không có mật khẩu chung của trường**. Mỗi học sinh chỉ xác thực bằng chính **Ngày tháng năm sinh** của mình (`14/04/2011` hoặc `14042011`) hoặc mật khẩu cá nhân. Mọi mật khẩu chung đều bị từ chối.
 
 ### Bảng tài khoản mẫu kiểm thử:
-| Cơ sở | Ô 1: MSHS hoặc Email | Ô 2: Ngày sinh hoặc Mật khẩu | Họ và tên | Lớp | Điểm Toán |
+| Cơ sở | Ô 1: MSHS hoặc Email | Ô 2: Ngày sinh (hoặc mật khẩu riêng) | Họ và tên | Lớp | Điểm Toán |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **An Đông** | `26040` *(hoặc `26040@ttgdtxcva.edu.vn`)* | `14/04/2011` *(hoặc `14042011`, `cva@123`)* | NGÔ DIỆU ÁI | 10A1 | 3.35 đ |
-| **An Đông** | `24001` *(hoặc `24001@ttgdtxcva.edu.vn`)* | `27/02/2009` *(hoặc `27022009`, `cva@123`)* | MAI HỒNG AN | 12A1 | 7.75 đ |
-| **An Đông** | `24469` *(hoặc `24469@ttgdtxcva.edu.vn`)* | `08/10/2008` *(hoặc `08102008`, `cva@123`)* | TO HOÀI ÂN | 12A1 | 6.75 đ |
-| **An Đông** | `24002` *(hoặc `24002@ttgdtxcva.edu.vn`)* | `15/12/2009` *(hoặc `15122009`, `cva@123`)* | LÝ GIA BẢO | 12A1 | 6.75 đ |
+| **An Đông** | `26040` *(hoặc `26040@ttgdtxcva.edu.vn`)* | `14/04/2011` *(hoặc `14042011`)* | NGÔ DIỆU ÁI | 10A1 | 3.35 đ |
+| **An Đông** | `24001` *(hoặc `24001@ttgdtxcva.edu.vn`)* | `27/02/2009` *(hoặc `27022009`)* | MAI HỒNG AN | 12A1 | 7.75 đ |
+| **An Đông** | `24469` *(hoặc `24469@ttgdtxcva.edu.vn`)* | `08/10/2008` *(hoặc `08102008`)* | TO HOÀI ÂN | 12A1 | 6.75 đ |
+| **An Đông** | `24002` *(hoặc `24002@ttgdtxcva.edu.vn`)* | `15/12/2009` *(hoặc `15122009`)* | LÝ GIA BẢO | 12A1 | 6.75 đ |
 | **Chợ Lớn** | `A0000160` | `03/04/2007` *(hoặc `03042007`)* | NGUYỄN QUỐC ANH | 12C | 7.75 đ |
 | **Chợ Lớn** | `A0000002` | `10/08/2009` *(hoặc `10082009`)* | HUỲNH TUẤN ĐẠT | 10A | 9.25 đ |

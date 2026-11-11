@@ -63,9 +63,6 @@ async function verifyStudentPassword(student, password) {
   if (accId && pwd.toLowerCase() === accId.toLowerCase()) return true;
   if (sid && pwd.toUpperCase() === sid.toUpperCase()) return true;
 
-  // 4. Mật khẩu khởi tạo chung
-  if (["cva@123", "cva123", "123456", "cva2026"].includes(pwd.toLowerCase())) return true;
-
   return false;
 }
 
