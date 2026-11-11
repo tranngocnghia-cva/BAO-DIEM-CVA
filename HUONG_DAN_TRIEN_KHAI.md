@@ -147,24 +147,19 @@ Hệ thống được thiết kế theo mô hình quan hệ linh hoạt:
 
 ---
 
-## 5. TÀI KHOẢN HỌC SINH MẪU ĐỂ KIỂM THỬ (CẢ 2 PHƯƠNG THỨC)
+## 5. TÀI KHOẢN HỌC SINH MẪU ĐỂ KIỂM THỬ (FORM TỰ ĐỘNG NHẬN DIỆN)
 
-> **Lưu ý quan trọng**: MSHS chính thức của học sinh là **5 chữ số trong Email trường** (ví dụ: `26040`, `24001`). Hệ thống cũng hỗ trợ học sinh gõ mã số thi tạm thời cũ (`10000001`, `A0000160`) để đảm bảo không ai bị gián đoạn.
+> **Lưu ý quan trọng**: 
+> - Học sinh **không cần chọn phương thức**: Giao diện chỉ có 2 ô nhập, máy chủ tự động nhận diện và đối chiếu.
+> - **MSHS chính thức** là **5 chữ số trong Email trường** (ví dụ: `26040`, `24001`). Hệ thống cũng hỗ trợ học sinh gõ email trường đầy đủ hoặc mã thi cũ.
+> - **Thông tin xác thực (Ô 2)**: Nhận mọi định dạng ngày sinh (`14/04/2011`, `14042011`) hoặc mật khẩu tài khoản (`cva@123`).
 
-### Cách 1: Tra cứu bằng Mã số học sinh (5 số MSHS) & Ngày sinh
-| Cơ sở | MSHS (5 số email) | Mã thi cũ | Ngày sinh | Họ và tên | Lớp | Điểm Toán |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **An Đông** | `26040` | `10000001` | `14/04/2011` | NGÔ DIỆU ÁI | 10A1 | 3.35 đ |
-| **An Đông** | `26002` | `10000002` | `03/04/2010` | HUỲNH THẾ THIÊN ÂN | 10A1 | 4.25 đ |
-| **An Đông** | `24001` | `12000001` | `27/02/2009` | MAI HỒNG AN | 12A1 | 7.75 đ |
-| **An Đông** | `24469` | `12000002` | `08/10/2008` | TO HOÀI ÂN | 12A1 | 6.75 đ |
-| **Chợ Lớn** | `A0000002` | `A0000002` | `10/08/2009` | HUỲNH TUẤN ĐẠT | 10A | 9.25 đ |
-| **Chợ Lớn** | `A0000160` | `A0000160` | `03/04/2007` | NGUYỄN QUỐC ANH | 12C | 7.75 đ |
-
-### Cách 2: Đăng nhập bằng Email trường (@ttgdtxcva.edu.vn) & Mật khẩu
-| Email trường | MSHS (5 số) | Mật khẩu mặc định | Họ và tên | Lớp |
-| :--- | :--- | :--- | :--- | :--- |
-| `26040@ttgdtxcva.edu.vn` | `26040` | `14042011` *(hoặc `cva@123`)* | NGÔ DIỆU ÁI | 10A1 |
-| `24001@ttgdtxcva.edu.vn` | `24001` | `27022009` *(hoặc `cva@123`)* | MAI HỒNG AN | 12A1 |
-| `24469@ttgdtxcva.edu.vn` | `24469` | `08102008` *(hoặc `cva@123`)* | TO HOÀI ÂN | 12A1 |
-| `24002@ttgdtxcva.edu.vn` | `24002` | `15122009` *(hoặc `cva@123`)* | LÝ GIA BẢO | 12A1 |
+### Bảng tài khoản mẫu kiểm thử:
+| Cơ sở | Ô 1: MSHS hoặc Email | Ô 2: Ngày sinh hoặc Mật khẩu | Họ và tên | Lớp | Điểm Toán |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **An Đông** | `26040` *(hoặc `26040@ttgdtxcva.edu.vn`)* | `14/04/2011` *(hoặc `14042011`, `cva@123`)* | NGÔ DIỆU ÁI | 10A1 | 3.35 đ |
+| **An Đông** | `24001` *(hoặc `24001@ttgdtxcva.edu.vn`)* | `27/02/2009` *(hoặc `27022009`, `cva@123`)* | MAI HỒNG AN | 12A1 | 7.75 đ |
+| **An Đông** | `24469` *(hoặc `24469@ttgdtxcva.edu.vn`)* | `08/10/2008` *(hoặc `08102008`, `cva@123`)* | TO HOÀI ÂN | 12A1 | 6.75 đ |
+| **An Đông** | `24002` *(hoặc `24002@ttgdtxcva.edu.vn`)* | `15/12/2009` *(hoặc `15122009`, `cva@123`)* | LÝ GIA BẢO | 12A1 | 6.75 đ |
+| **Chợ Lớn** | `A0000160` | `03/04/2007` *(hoặc `03042007`)* | NGUYỄN QUỐC ANH | 12C | 7.75 đ |
+| **Chợ Lớn** | `A0000002` | `10/08/2009` *(hoặc `10082009`)* | HUỲNH TUẤN ĐẠT | 10A | 9.25 đ |

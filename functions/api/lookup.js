@@ -93,91 +93,73 @@ export async function onRequestPost(context) {
       );
     }
 
-    let method = body.method;
-    if (!method) {
-      method = body.email || body.password ? "email" : "mshs";
+    // Lấy thông tin định danh (identifier) và thông tin bảo mật (secret)
+    const rawIdentifier = String(body.identifier || body.studentId || body.email || "").trim();
+    const rawSecret = String(body.secret || body.dob || body.password || "").trim();
+
+    if (!rawIdentifier || !rawSecret) {
+      return new Response(
+        JSON.stringify({ error: "Vui lòng nhập đầy đủ Mã số học sinh (hoặc Email) và Ngày sinh (hoặc Mật khẩu)." }),
+        { status: 400, headers: corsHeaders }
+      );
     }
 
-    let studentRow = null;
+    const accId = rawIdentifier.split("@")[0];
 
-    // --- PHƯƠNG THỨC 2: EMAIL TRƯỜNG / SỐ TÀI KHOẢN + MẬT KHẨU ---
-    if (method === "email") {
-      const rawEmail = (body.email || "").trim().toLowerCase();
-      const password = body.password || "";
+    // 1. Tìm bản ghi học sinh dựa trên mọi loại mã định danh
+    const studentStmt = env.DB.prepare(`
+      SELECT id, mshs, student_id, full_name, class_name, gender, dob, campus, email, account_id, password_hash
+      FROM students
+      WHERE mshs = ? OR account_id = ? OR UPPER(student_id) = ? 
+         OR LOWER(email) = ? OR LOWER(email) = ?
+    `);
+    const studentRow = await studentStmt.bind(
+      rawIdentifier,
+      accId,
+      rawIdentifier.toUpperCase(),
+      rawIdentifier.toLowerCase(),
+      `${accId.toLowerCase()}@ttgdtxcva.edu.vn`
+    ).first();
 
-      if (!rawEmail || !password) {
-        return new Response(
-          JSON.stringify({ error: "Vui lòng nhập đầy đủ Email trường (hoặc Số tài khoản) và Mật khẩu." }),
-          { status: 400, headers: corsHeaders }
-        );
-      }
+    if (!studentRow) {
+      return new Response(
+        JSON.stringify({
+          error: "Không tìm thấy học sinh với thông tin này. Gợi ý: Nhập 5 số mã học sinh (5 số email trường của em, ví dụ: 26040, 24001)!",
+        }),
+        { status: 400, headers: corsHeaders }
+      );
+    }
 
-      const accId = rawEmail.split("@")[0];
-      const studentStmt = env.DB.prepare(`
-        SELECT id, mshs, student_id, full_name, class_name, gender, dob, campus, email, account_id, password_hash
-        FROM students
-        WHERE LOWER(email) = ? OR LOWER(email) = ? OR mshs = ? OR account_id = ? OR UPPER(student_id) = ?
-      `);
-      studentRow = await studentStmt.bind(rawEmail, `${accId}@ttgdtxcva.edu.vn`, accId, accId, accId.toUpperCase()).first();
+    // 2. Tự động kiểm tra thông tin bảo mật (Ngày sinh hoặc Mật khẩu)
+    let isValid = false;
 
-      if (!studentRow) {
-        return new Response(
-          JSON.stringify({ error: "Không tìm thấy tài khoản học sinh với email hoặc số tài khoản này. Vui lòng kiểm tra lại!" }),
-          { status: 400, headers: corsHeaders }
-        );
-      }
+    // a. So khớp Ngày sinh (chuẩn hóa định dạng dd/mm/yyyy)
+    const normSecret = normalizeDob(rawSecret);
+    if (normSecret && normSecret === studentRow.dob) {
+      isValid = true;
+    }
 
-      const isValid = await verifyStudentPassword(studentRow, password);
-      if (!isValid) {
-        return new Response(
-          JSON.stringify({
-            error: "Mật khẩu không chính xác. Gợi ý: Mật khẩu mặc định là Ngày tháng năm sinh (ddmmyyyy, ví dụ: 27022009)!",
-          }),
-          { status: 400, headers: corsHeaders }
-        );
+    // b. So khớp Ngày sinh dạng chữ số liền nhau (ddmmyyyy)
+    if (!isValid) {
+      const dobDigits = (studentRow.dob || "").replace(/\D/g, "");
+      const secretDigits = rawSecret.replace(/\D/g, "");
+      if (dobDigits && secretDigits === dobDigits) {
+        isValid = true;
       }
     }
-    // --- PHƯƠNG THỨC 1: MÃ SỐ HỌC SINH + NGÀY SINH ---
-    else {
-      const rawStudentId = (body.studentId || "").trim().toUpperCase();
-      const rawDob = (body.dob || "").trim();
 
-      if (!rawStudentId || !rawDob) {
-        return new Response(
-          JSON.stringify({ error: "Vui lòng nhập đầy đủ Mã số học sinh và Ngày tháng năm sinh." }),
-          { status: 400, headers: corsHeaders }
-        );
-      }
+    // c. So khớp qua hàm xác thực mật khẩu
+    if (!isValid) {
+      isValid = await verifyStudentPassword(studentRow, rawSecret);
+    }
 
-      const normDob = normalizeDob(rawDob);
-
-      // Tra cứu theo 5 số MSHS (hoặc mã số thi/tài khoản)
-      const studentStmt = env.DB.prepare(`
-        SELECT id, mshs, student_id, full_name, class_name, gender, dob, campus, email, account_id, password_hash
-        FROM students
-        WHERE (mshs = ? OR account_id = ? OR UPPER(student_id) = ?) AND dob = ?
-      `);
-      studentRow = await studentStmt.bind(rawStudentId, rawStudentId, rawStudentId, normDob).first();
-
-      if (!studentRow) {
-        const checkStmt = env.DB.prepare(`
-          SELECT student_id FROM students 
-          WHERE mshs = ? OR account_id = ? OR UPPER(student_id) = ?
-        `);
-        const checkRow = await checkStmt.bind(rawStudentId, rawStudentId, rawStudentId).first();
-        if (checkRow) {
-          return new Response(
-            JSON.stringify({
-              error: "Mã số học sinh đúng nhưng Ngày sinh không khớp. Vui lòng kiểm tra lại ngày sinh (ngày/tháng/năm)!",
-            }),
-            { status: 400, headers: corsHeaders }
-          );
-        }
-        return new Response(
-          JSON.stringify({ error: "Không tìm thấy học sinh với Mã số này. Gợi ý: Nhập 5 số mã học sinh (5 số email trường của em, ví dụ: 26040, 24001)!" }),
-          { status: 400, headers: corsHeaders }
-        );
-      }
+    if (!isValid) {
+      return new Response(
+        JSON.stringify({
+          error: "Thông tin xác thực (Ngày sinh hoặc Mật khẩu) không khớp. Vui lòng kiểm tra lại ngày sinh (ngày/tháng/năm)!",
+        }),
+        { status: 400, headers: corsHeaders }
+      );
     }
 
     const examSubId = studentRow.student_id;

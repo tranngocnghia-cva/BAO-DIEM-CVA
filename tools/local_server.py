@@ -94,9 +94,10 @@ def verify_student_password(student, password):
 
 def query_student_scores(data):
     """
-    Truy vấn thông tin học sinh và toàn bộ điểm số các môn theo 2 phương thức:
-    - Phương thức 1: studentId + dob (Tra cứu nhanh không cần mật khẩu)
-    - Phương thức 2: email + password (Đăng nhập bằng tài khoản trường @ttgdtxcva.edu.vn)
+    Truy vấn thông tin học sinh và toàn bộ điểm số các môn:
+    Tự động nhận diện phương thức dựa trên thông tin học sinh nhập:
+    - Identifier: MSHS (5 số), Email trường (@ttgdtxcva.edu.vn), hoặc SBD thi cũ
+    - Secret: Ngày tháng năm sinh (mọi định dạng) hoặc Mật khẩu
     """
     if not LOCAL_DB_PATH.exists():
         return {"error": "Chưa có cơ sở dữ liệu. Hãy chạy 'python tools/sync_and_upload.py' trước!"}
@@ -105,72 +106,53 @@ def query_student_scores(data):
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
     
-    # Tự động xác định phương thức tra cứu
-    method = data.get("method")
-    if not method:
-        if data.get("email") or data.get("password"):
-            method = "email"
-        else:
-            method = "mshs"
-            
-    student_row = None
+    # Lấy thông tin định danh (identifier) và thông tin bảo mật (secret)
+    raw_identifier = str(data.get("identifier") or data.get("studentId") or data.get("email") or "").strip()
+    raw_secret = str(data.get("secret") or data.get("dob") or data.get("password") or "").strip()
     
-    # --- PHƯƠNG THỨC 2: EMAIL / SỐ TÀI KHOẢN + MẬT KHẨU ---
-    if method == "email":
-        raw_email = (data.get("email") or "").strip().lower()
-        password = data.get("password") or ""
+    if not raw_identifier or not raw_secret:
+        conn.close()
+        return {"error": "Vui lòng nhập đầy đủ Mã số học sinh (hoặc Email) và Ngày sinh (hoặc Mật khẩu)."}
         
-        if not raw_email or not password:
-            conn.close()
-            return {"error": "Vui lòng nhập đầy đủ Email trường (hoặc Số tài khoản) và Mật khẩu."}
-            
-        acc_id = raw_email.split("@")[0]
-        cur.execute("""
-            SELECT id, mshs, student_id, full_name, class_name, gender, dob, campus, email, account_id, password_hash
-            FROM students
-            WHERE LOWER(email) = ? OR LOWER(email) = ? OR mshs = ? OR account_id = ? OR UPPER(student_id) = ?
-        """, (raw_email, f"{acc_id}@ttgdtxcva.edu.vn", acc_id, acc_id, acc_id.upper()))
-        student_row = cur.fetchone()
+    acc_id = raw_identifier.split("@")[0]
+    
+    # 1. Tìm bản ghi học sinh dựa trên mọi loại mã định danh
+    cur.execute("""
+        SELECT id, mshs, student_id, full_name, class_name, gender, dob, campus, email, account_id, password_hash
+        FROM students
+        WHERE mshs = ? OR account_id = ? OR UPPER(student_id) = ? 
+           OR LOWER(email) = ? OR LOWER(email) = ?
+    """, (raw_identifier, acc_id, raw_identifier.upper(), raw_identifier.lower(), f"{acc_id.lower()}@ttgdtxcva.edu.vn"))
+    student_row = cur.fetchone()
+    
+    if not student_row:
+        conn.close()
+        return {"error": "Không tìm thấy học sinh với thông tin này. Gợi ý: Nhập 5 số mã học sinh (5 số email trường của em, ví dụ: 26040, 24001)!"}
         
-        if not student_row:
-            conn.close()
-            return {"error": "Không tìm thấy tài khoản học sinh với email hoặc số tài khoản này. Vui lòng kiểm tra lại!"}
-            
-        student_data = dict(student_row)
-        if not verify_student_password(student_data, password):
-            conn.close()
-            return {"error": "Mật khẩu không chính xác. Gợi ý: Mật khẩu mặc định là Ngày tháng năm sinh (ddmmyyyy, ví dụ: 27022009)!"}
-
-    # --- PHƯƠNG THỨC 1: MÃ SỐ HỌC SINH + NGÀY SINH ---
-    else:
-        student_id = (data.get("studentId") or "").strip().upper()
-        dob = data.get("dob") or ""
+    student_data = dict(student_row)
+    
+    # 2. Tự động kiểm tra thông tin bảo mật (Ngày sinh hoặc Mật khẩu)
+    is_valid = False
+    
+    # a. So khớp Ngày sinh (chuẩn hóa định dạng dd/mm/yyyy)
+    norm_secret = normalize_dob(raw_secret)
+    if norm_secret and norm_secret == student_data.get("dob"):
+        is_valid = True
         
-        if not student_id or not dob:
-            conn.close()
-            return {"error": "Vui lòng nhập đầy đủ Mã số học sinh và Ngày tháng năm sinh."}
+    # b. So khớp Ngày sinh chỉ lấy các chữ số (ddmmyyyy)
+    if not is_valid:
+        dob_digits = re.sub(r"\D", "", student_data.get("dob") or "")
+        secret_digits = re.sub(r"\D", "", raw_secret)
+        if dob_digits and secret_digits == dob_digits:
+            is_valid = True
             
-        norm_dob = normalize_dob(dob)
-        # Tra cứu theo 5 số MSHS (hoặc mã số thi/tài khoản)
-        cur.execute("""
-            SELECT id, mshs, student_id, full_name, class_name, gender, dob, campus, email, account_id, password_hash
-            FROM students
-            WHERE (mshs = ? OR account_id = ? OR UPPER(student_id) = ?) AND dob = ?
-        """, (student_id, student_id, student_id, norm_dob))
-        student_row = cur.fetchone()
+    # c. So khớp qua hàm xác thực mật khẩu (password_hash, mật khẩu mặc định, mã tài khoản)
+    if not is_valid:
+        is_valid = verify_student_password(student_data, raw_secret)
         
-        if not student_row:
-            cur.execute("""
-                SELECT student_id FROM students 
-                WHERE mshs = ? OR account_id = ? OR UPPER(student_id) = ?
-            """, (student_id, student_id, student_id))
-            if cur.fetchone():
-                conn.close()
-                return {"error": "Mã số học sinh đúng nhưng Ngày sinh không khớp. Vui lòng kiểm tra lại ngày sinh (ngày/tháng/năm)!"}
-            conn.close()
-            return {"error": "Không tìm thấy học sinh với Mã số này. Gợi ý: Nhập 5 số mã học sinh (5 số email trường của em, ví dụ: 26040, 24001)!"}
-            
-        student_data = dict(student_row)
+    if not is_valid:
+        conn.close()
+        return {"error": "Thông tin xác thực (Ngày sinh hoặc Mật khẩu) không khớp. Vui lòng kiểm tra lại ngày sinh (ngày/tháng/năm)!"}
         
     exam_sub_id = student_data["student_id"]
     student_data["display_mshs"] = student_data.get("mshs") or student_data["student_id"]
