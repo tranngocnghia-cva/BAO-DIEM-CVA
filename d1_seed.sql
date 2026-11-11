@@ -4,7 +4,6 @@
 -- ====================================================================
 
 PRAGMA foreign_keys = OFF;
-BEGIN TRANSACTION;
 
 -- 1. Năm học
 INSERT OR REPLACE INTO academic_years (id, code, name, is_active) VALUES (1, '2026-2027', 'Năm học 2026 - 2027', 1);
@@ -5588,5 +5587,3 @@ INSERT OR REPLACE INTO submissions
 INSERT OR REPLACE INTO submissions 
             (exam_id, subject_id, student_id, exam_code, total_score, part1_score, part2_score, part3_score, correct_count, total_questions, confidence, pdf_key, status, review_reason)
             VALUES (1, 1, '11000040', '1116', 4.45, 1.5, 1.45, 1.5, 10, 22, 0.951, 'AN-DONG/11A1/11000040_NGUYEN_NGOC_NHU_Y_1116_4.45d.pdf', 'VALID', '');
-
-COMMIT;

@@ -5,11 +5,10 @@
   "scripts": {
     "local": "python tools/local_server.py",
     "sync": "python tools/sync_and_upload.py",
-    "dev": "wrangler pages dev .",
-    "deploy": "wrangler pages deploy ."
+    "dev": "wrangler pages dev ."
   },
   "devDependencies": {
-    "wrangler": "^3.80.0"
+    "wrangler": "^4.160.0"
   },
   "keywords": [
     "bao-diem",

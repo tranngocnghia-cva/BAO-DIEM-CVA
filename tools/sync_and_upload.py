@@ -141,7 +141,6 @@ def extract_and_build(source_db_path=DEFAULT_SOURCE_DB):
         "-- ====================================================================",
         "",
         "PRAGMA foreign_keys = OFF;",
-        "BEGIN TRANSACTION;",
         ""
     ]
     
@@ -310,8 +309,6 @@ def extract_and_build(source_db_path=DEFAULT_SOURCE_DB):
         """, (exam_id, subject_id, sbd, exam_code, total_score, p1, p2, p3, correct_count, total_questions, confidence, pdf_key, status, sub['review_reason'] or ''))
         sub_count += 1
         
-    sql_lines.append("\nCOMMIT;")
-    
     # Ghi file seed SQL
     with open(SEED_SQL_PATH, "w", encoding="utf-8") as f:
         f.write("\n".join(sql_lines))
