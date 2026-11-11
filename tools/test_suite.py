@@ -50,7 +50,27 @@ def run_tests():
     except Exception as e:
         assert_test("Trang chủ GET /", False, str(e))
 
-    # TEST 2: Tra cứu học sinh An Đông hợp lệ (10000001, 14/04/2011)
+    # TEST 2: Tra cứu bằng 5 số MSHS (26040, 14/04/2011) - Ngô Diệu Ái
+    try:
+        req = urllib.request.Request(
+            f"{base_url}/api/lookup",
+            data=json.dumps({"studentId": "26040", "dob": "14/04/2011"}).encode("utf-8"),
+            headers={"Content-Type": "application/json"}
+        )
+        with urllib.request.urlopen(req) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            assert_test(
+                "Tra cứu bằng 5 số MSHS (26040)",
+                data.get("success") is True and data["student"]["full_name"] == "NGÔ DIỆU ÁI" and data["student"]["display_mshs"] == "26040" and len(data["scores"]) > 0,
+                f"Data: {data}"
+            )
+            # Kiểm tra URL PDF
+            pdf_url = data["scores"][0]["pdf_url"]
+            assert_test("Có đường dẫn PDF hợp lệ", pdf_url and pdf_url.endswith(".pdf"))
+    except Exception as e:
+        assert_test("Tra cứu bằng 5 số MSHS (26040)", False, str(e))
+
+    # TEST 2b: Tra cứu tương thích ngược bằng mã số thi cũ (10000001)
     try:
         req = urllib.request.Request(
             f"{base_url}/api/lookup",
@@ -60,15 +80,11 @@ def run_tests():
         with urllib.request.urlopen(req) as resp:
             data = json.loads(resp.read().decode("utf-8"))
             assert_test(
-                "Tra cứu An Đông (10000001)",
-                data.get("success") is True and data["student"]["full_name"] == "NGÔ DIỆU ÁI" and len(data["scores"]) > 0,
-                f"Data: {data}"
+                "Tra cứu tương thích ngược mã thi cũ (10000001)",
+                data.get("success") is True and data["student"]["full_name"] == "NGÔ DIỆU ÁI"
             )
-            # Kiểm tra URL PDF
-            pdf_url = data["scores"][0]["pdf_url"]
-            assert_test("Có đường dẫn PDF hợp lệ", pdf_url and pdf_url.endswith(".pdf"))
     except Exception as e:
-        assert_test("Tra cứu An Đông (10000001)", False, str(e))
+        assert_test("Tra cứu tương thích ngược mã thi cũ (10000001)", False, str(e))
 
     # TEST 3: Tra cứu học sinh Chợ Lớn hợp lệ (A0000160, 03/04/2007)
     try:

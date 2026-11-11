@@ -34,20 +34,23 @@ CREATE TABLE IF NOT EXISTS exams (
 -- 4. Bảng Học sinh
 CREATE TABLE IF NOT EXISTS students (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    student_id TEXT NOT NULL UNIQUE,    -- MSHS / Số báo danh (ví dụ: 10000001, A0000160)
+    mshs TEXT,                          -- Mã số học sinh chính thức (5 số trong email trường, ví dụ: 26040, 24001)
+    student_id TEXT NOT NULL UNIQUE,    -- Số báo danh kỳ thi / Khóa ngoại liên kết bảng điểm bài thi (ví dụ: 10000001)
     full_name TEXT NOT NULL,            -- Họ và tên học sinh
     class_name TEXT NOT NULL,           -- Lớp (ví dụ: 10A1, 12C, 10A)
     gender TEXT,                        -- Nam / Nữ
     dob TEXT NOT NULL,                  -- Ngày sinh dạng DD/MM/YYYY (ví dụ: 14/04/2011)
     campus TEXT DEFAULT 'AN-DONG',      -- AN-DONG hoặc CHO-LON
-    email TEXT UNIQUE,                  -- Email trường (ví dụ: 24001@ttgdtxcva.edu.vn)
-    account_id TEXT,                    -- Mã số tài khoản Google (ví dụ: 24001)
+    email TEXT UNIQUE,                  -- Email trường (ví dụ: 26040@ttgdtxcva.edu.vn)
+    account_id TEXT,                    -- 5 số tài khoản Google (ví dụ: 26040)
     password_hash TEXT,                 -- Mật khẩu hoặc mã băm mật khẩu
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- Tạo Index để tăng tốc độ tra cứu tức thì theo student_id, dob, email, account_id
-CREATE INDEX IF NOT EXISTS idx_students_lookup ON students(student_id, dob);
+-- Tạo Index để tăng tốc độ tra cứu tức thì theo mshs, student_id, dob, email, account_id
+CREATE INDEX IF NOT EXISTS idx_students_mshs ON students(mshs);
+CREATE INDEX IF NOT EXISTS idx_students_lookup ON students(mshs, dob);
+CREATE INDEX IF NOT EXISTS idx_students_sbd ON students(student_id, dob);
 CREATE INDEX IF NOT EXISTS idx_students_email ON students(email);
 CREATE INDEX IF NOT EXISTS idx_students_account ON students(account_id);
 CREATE INDEX IF NOT EXISTS idx_students_class ON students(class_name);

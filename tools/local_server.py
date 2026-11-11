@@ -126,10 +126,10 @@ def query_student_scores(data):
             
         acc_id = raw_email.split("@")[0]
         cur.execute("""
-            SELECT id, student_id, full_name, class_name, gender, dob, campus, email, account_id, password_hash
+            SELECT id, mshs, student_id, full_name, class_name, gender, dob, campus, email, account_id, password_hash
             FROM students
-            WHERE LOWER(email) = ? OR LOWER(email) = ? OR account_id = ? OR UPPER(student_id) = ?
-        """, (raw_email, f"{acc_id}@ttgdtxcva.edu.vn", acc_id, acc_id.upper()))
+            WHERE LOWER(email) = ? OR LOWER(email) = ? OR mshs = ? OR account_id = ? OR UPPER(student_id) = ?
+        """, (raw_email, f"{acc_id}@ttgdtxcva.edu.vn", acc_id, acc_id, acc_id.upper()))
         student_row = cur.fetchone()
         
         if not student_row:
@@ -151,24 +151,30 @@ def query_student_scores(data):
             return {"error": "Vui lòng nhập đầy đủ Mã số học sinh và Ngày tháng năm sinh."}
             
         norm_dob = normalize_dob(dob)
+        # Tra cứu theo 5 số MSHS (hoặc mã số thi/tài khoản)
         cur.execute("""
-            SELECT id, student_id, full_name, class_name, gender, dob, campus, email, account_id, password_hash
+            SELECT id, mshs, student_id, full_name, class_name, gender, dob, campus, email, account_id, password_hash
             FROM students
-            WHERE UPPER(student_id) = ? AND dob = ?
-        """, (student_id, norm_dob))
+            WHERE (mshs = ? OR account_id = ? OR UPPER(student_id) = ?) AND dob = ?
+        """, (student_id, student_id, student_id, norm_dob))
         student_row = cur.fetchone()
         
         if not student_row:
-            cur.execute("SELECT student_id FROM students WHERE UPPER(student_id) = ?", (student_id,))
+            cur.execute("""
+                SELECT student_id FROM students 
+                WHERE mshs = ? OR account_id = ? OR UPPER(student_id) = ?
+            """, (student_id, student_id, student_id))
             if cur.fetchone():
                 conn.close()
                 return {"error": "Mã số học sinh đúng nhưng Ngày sinh không khớp. Vui lòng kiểm tra lại ngày sinh (ngày/tháng/năm)!"}
             conn.close()
-            return {"error": "Không tìm thấy học sinh với Mã số này. Vui lòng kiểm tra lại!"}
+            return {"error": "Không tìm thấy học sinh với Mã số này. Gợi ý: Nhập 5 số mã học sinh (5 số email trường của em, ví dụ: 26040, 24001)!"}
             
         student_data = dict(student_row)
         
-    student_id = student_data["student_id"]
+    exam_sub_id = student_data["student_id"]
+    student_data["display_mshs"] = student_data.get("mshs") or student_data["student_id"]
+    student_data["exam_sbd"] = student_data["student_id"]
     # Bảo mật: không gửi password_hash về client
     student_data.pop("password_hash", None)
     
@@ -184,7 +190,7 @@ def query_student_scores(data):
         JOIN subjects subj ON sub.subject_id = subj.id
         WHERE UPPER(sub.student_id) = ?
         ORDER BY subj.sort_order, e.id
-    """, (student_id,))
+    """, (exam_sub_id,))
     
     sub_rows = cur.fetchall()
     conn.close()

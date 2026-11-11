@@ -114,11 +114,11 @@ export async function onRequestPost(context) {
 
       const accId = rawEmail.split("@")[0];
       const studentStmt = env.DB.prepare(`
-        SELECT id, student_id, full_name, class_name, gender, dob, campus, email, account_id, password_hash
+        SELECT id, mshs, student_id, full_name, class_name, gender, dob, campus, email, account_id, password_hash
         FROM students
-        WHERE LOWER(email) = ? OR LOWER(email) = ? OR account_id = ? OR UPPER(student_id) = ?
+        WHERE LOWER(email) = ? OR LOWER(email) = ? OR mshs = ? OR account_id = ? OR UPPER(student_id) = ?
       `);
-      studentRow = await studentStmt.bind(rawEmail, `${accId}@ttgdtxcva.edu.vn`, accId, accId.toUpperCase()).first();
+      studentRow = await studentStmt.bind(rawEmail, `${accId}@ttgdtxcva.edu.vn`, accId, accId, accId.toUpperCase()).first();
 
       if (!studentRow) {
         return new Response(
@@ -151,16 +151,20 @@ export async function onRequestPost(context) {
 
       const normDob = normalizeDob(rawDob);
 
+      // Tra cứu theo 5 số MSHS (hoặc mã số thi/tài khoản)
       const studentStmt = env.DB.prepare(`
-        SELECT id, student_id, full_name, class_name, gender, dob, campus, email, account_id, password_hash
+        SELECT id, mshs, student_id, full_name, class_name, gender, dob, campus, email, account_id, password_hash
         FROM students
-        WHERE UPPER(student_id) = ? AND dob = ?
+        WHERE (mshs = ? OR account_id = ? OR UPPER(student_id) = ?) AND dob = ?
       `);
-      studentRow = await studentStmt.bind(rawStudentId, normDob).first();
+      studentRow = await studentStmt.bind(rawStudentId, rawStudentId, rawStudentId, normDob).first();
 
       if (!studentRow) {
-        const checkStmt = env.DB.prepare("SELECT student_id FROM students WHERE UPPER(student_id) = ?");
-        const checkRow = await checkStmt.bind(rawStudentId).first();
+        const checkStmt = env.DB.prepare(`
+          SELECT student_id FROM students 
+          WHERE mshs = ? OR account_id = ? OR UPPER(student_id) = ?
+        `);
+        const checkRow = await checkStmt.bind(rawStudentId, rawStudentId, rawStudentId).first();
         if (checkRow) {
           return new Response(
             JSON.stringify({
@@ -170,13 +174,15 @@ export async function onRequestPost(context) {
           );
         }
         return new Response(
-          JSON.stringify({ error: "Không tìm thấy học sinh với Mã số này. Vui lòng kiểm tra lại!" }),
+          JSON.stringify({ error: "Không tìm thấy học sinh với Mã số này. Gợi ý: Nhập 5 số mã học sinh (5 số email trường của em, ví dụ: 26040, 24001)!" }),
           { status: 400, headers: corsHeaders }
         );
       }
     }
 
-    const studentId = studentRow.student_id;
+    const examSubId = studentRow.student_id;
+    studentRow.display_mshs = studentRow.mshs || studentRow.student_id;
+    studentRow.exam_sbd = studentRow.student_id;
     // Xóa password_hash trước khi trả về client
     delete studentRow.password_hash;
 
@@ -193,7 +199,7 @@ export async function onRequestPost(context) {
       WHERE UPPER(sub.student_id) = ?
       ORDER BY subj.sort_order, e.id
     `);
-    const { results: subRows } = await scoresStmt.bind(studentId).all();
+    const { results: subRows } = await scoresStmt.bind(examSubId).all();
 
     const scores = (subRows || []).map((r) => ({
       ...r,

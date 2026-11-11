@@ -194,6 +194,14 @@ def extract_and_build(source_db_path=DEFAULT_SOURCE_DB):
     accounts_map = load_student_accounts()
     used_emails = set()
     linked_count = 0
+
+    alias_map = {
+        '10000473': '26479',
+        'A0000026': '26591',
+        'A0000030': '26595',
+        '10000276': '26319',
+        '11000116': '25121',
+    }
     
     for stu in students:
         sbd = stu['student_id'].strip()
@@ -213,25 +221,33 @@ def extract_and_build(source_db_path=DEFAULT_SOURCE_DB):
             campus = 'AN-DONG'
 
         # Ghép nối tài khoản email trường (@ttgdtxcva.edu.vn)
-        norm_n = normalize_name(raw_name)
-        cands = accounts_map.get(norm_n, [])
-        available = [x for x in cands if x['email'] not in used_emails]
-        
-        # Ưu tiên đúng khối lớp: 10 -> 26xxx, 11 -> 25xxx, 12 -> 24xxx
-        grade_digits = re.findall(r'\d+', cls)
-        grade_prefix = ''
-        if grade_digits:
-            grade_prefix = {'10': '26', '11': '25', '12': '24'}.get(grade_digits[0], '')
-            
         matched_acc = None
-        if available:
-            pref = [x for x in available if x['acc'].startswith(grade_prefix)]
-            matched_acc = pref[0] if pref else available[0]
+        if sbd in alias_map:
+            acc_id = alias_map[sbd]
+            matched_acc = {'acc': acc_id, 'email': f"{acc_id}@ttgdtxcva.edu.vn"}
             used_emails.add(matched_acc['email'])
             linked_count += 1
+        else:
+            norm_n = normalize_name(raw_name)
+            cands = accounts_map.get(norm_n, [])
+            available = [x for x in cands if x['email'] not in used_emails]
+            
+            # Ưu tiên đúng khối lớp: 10 -> 26xxx, 11 -> 25xxx, 12 -> 24xxx
+            grade_digits = re.findall(r'\d+', cls)
+            grade_prefix = ''
+            if grade_digits:
+                grade_prefix = {'10': '26', '11': '25', '12': '24'}.get(grade_digits[0], '')
+                
+            if available:
+                pref = [x for x in available if x['acc'].startswith(grade_prefix)]
+                matched_acc = pref[0] if pref else available[0]
+                used_emails.add(matched_acc['email'])
+                linked_count += 1
             
         email = matched_acc['email'] if matched_acc else None
         account_id = matched_acc['acc'] if matched_acc else None
+        # MSHS chính thức là 5 số của email trường (ví dụ: 26040, 24001)
+        mshs = account_id if account_id else sbd
         
         # Mật khẩu mặc định: ddmmyyyy băm SHA-256
         dob_digits = re.sub(r'\D', '', norm_dob)
@@ -241,13 +257,13 @@ def extract_and_build(source_db_path=DEFAULT_SOURCE_DB):
         acc_val = f"'{account_id}'" if account_id else "NULL"
         pwd_val = f"'{pwd_hash}'" if pwd_hash else "NULL"
             
-        sql = f"INSERT OR REPLACE INTO students (student_id, full_name, class_name, gender, dob, campus, email, account_id, password_hash) VALUES ('{sbd}', '{name}', '{cls}', '{gender}', '{norm_dob}', '{campus}', {email_val}, {acc_val}, {pwd_val});"
+        sql = f"INSERT OR REPLACE INTO students (mshs, student_id, full_name, class_name, gender, dob, campus, email, account_id, password_hash) VALUES ('{mshs}', '{sbd}', '{name}', '{cls}', '{gender}', '{norm_dob}', '{campus}', {email_val}, {acc_val}, {pwd_val});"
         sql_lines.append(sql)
         dest_cur.execute("""
             INSERT OR REPLACE INTO students 
-            (student_id, full_name, class_name, gender, dob, campus, email, account_id, password_hash)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (sbd, raw_name, cls, gender, norm_dob, campus, email, account_id, pwd_hash))
+            (mshs, student_id, full_name, class_name, gender, dob, campus, email, account_id, password_hash)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (mshs, sbd, raw_name, cls, gender, norm_dob, campus, email, account_id, pwd_hash))
 
     print(f"[*] Đã liên kết tài khoản email trường cho {linked_count}/{len(students)} học sinh ({linked_count/len(students)*100:.1f}%)")
 
