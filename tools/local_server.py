@@ -89,10 +89,9 @@ def verify_student_password(student, password):
 
 def query_student_scores(data):
     """
-    Truy vấn thông tin học sinh và toàn bộ điểm số các môn:
-    Tự động nhận diện phương thức dựa trên thông tin học sinh nhập:
-    - Identifier: MSHS (5 số), Email trường (@ttgdtxcva.edu.vn), hoặc SBD thi cũ
-    - Secret: Ngày tháng năm sinh (mọi định dạng) hoặc Mật khẩu
+    Truy vấn thông tin học sinh và điểm số các môn:
+    - Identifier: MSHS (5 số trong email trường, ví dụ: 26040, 24001), Email trường, hoặc SBD thi cũ
+    - DOB / Secret: Ngày tháng năm sinh (dd/mm/yyyy hoặc ddmmyyyy)
     """
     if not LOCAL_DB_PATH.exists():
         return {"error": "Chưa có cơ sở dữ liệu. Hãy chạy 'python tools/sync_and_upload.py' trước!"}
@@ -101,17 +100,17 @@ def query_student_scores(data):
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
     
-    # Lấy thông tin định danh (identifier) và thông tin bảo mật (secret)
-    raw_identifier = str(data.get("identifier") or data.get("studentId") or data.get("email") or "").strip()
-    raw_secret = str(data.get("secret") or data.get("dob") or data.get("password") or "").strip()
+    # Lấy thông tin định danh (identifier/mshs) và ngày sinh (dob/secret)
+    raw_identifier = str(data.get("identifier") or data.get("mshs") or data.get("studentId") or data.get("email") or "").strip()
+    raw_secret = str(data.get("dob") or data.get("secret") or data.get("password") or "").strip()
     
     if not raw_identifier or not raw_secret:
         conn.close()
-        return {"error": "Vui lòng nhập đầy đủ Mã số học sinh (hoặc Email) và Ngày sinh (hoặc Mật khẩu)."}
+        return {"error": "Vui lòng nhập đầy đủ Mã số học sinh và Ngày tháng năm sinh."}
         
     acc_id = raw_identifier.split("@")[0]
     
-    # 1. Tìm bản ghi học sinh dựa trên mọi loại mã định danh
+    # 1. Tìm bản ghi học sinh dựa trên 5 số MSHS, email trường hoặc mã thi cũ
     cur.execute("""
         SELECT id, mshs, student_id, full_name, class_name, gender, dob, campus, email, account_id, password_hash
         FROM students
@@ -122,11 +121,11 @@ def query_student_scores(data):
     
     if not student_row:
         conn.close()
-        return {"error": "Không tìm thấy học sinh với thông tin này. Gợi ý: Nhập 5 số mã học sinh (5 số email trường của em, ví dụ: 26040, 24001)!"}
+        return {"error": "Không tìm thấy học sinh với thông tin này. Gợi ý: Nhập đúng 5 số mã học sinh (5 số trong email trường của em, ví dụ: 26040, 24001)!"}
         
     student_data = dict(student_row)
     
-    # 2. Tự động kiểm tra thông tin bảo mật (Ngày sinh hoặc Mật khẩu)
+    # 2. Kiểm tra ngày sinh học sinh (hỗ trợ dd/mm/yyyy, ddmmyyyy, yyyy-mm-dd)
     is_valid = False
     
     # a. So khớp Ngày sinh (chuẩn hóa định dạng dd/mm/yyyy)
@@ -141,13 +140,13 @@ def query_student_scores(data):
         if dob_digits and secret_digits == dob_digits:
             is_valid = True
             
-    # c. So khớp qua hàm xác thực mật khẩu (password_hash, mật khẩu mặc định, mã tài khoản)
+    # c. So khớp qua hàm xác thực mật khẩu cá nhân (nếu học sinh nhập mật khẩu riêng)
     if not is_valid:
         is_valid = verify_student_password(student_data, raw_secret)
         
     if not is_valid:
         conn.close()
-        return {"error": "Thông tin xác thực (Ngày sinh hoặc Mật khẩu) không khớp. Vui lòng kiểm tra lại ngày sinh (ngày/tháng/năm)!"}
+        return {"error": "Ngày tháng năm sinh không khớp với dữ liệu học sinh. Vui lòng kiểm tra lại ngày sinh (ngày/tháng/năm)!"}
         
     exam_sub_id = student_data["student_id"]
     student_data["display_mshs"] = student_data.get("mshs") or student_data["student_id"]

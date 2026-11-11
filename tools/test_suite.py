@@ -118,20 +118,20 @@ def run_tests():
         except Exception as e:
             assert_test(f"Chuẩn hóa ngày sinh dạng '{d_var}'", False, str(e))
 
-    # TEST 5: Đúng mã học sinh nhưng sai ngày sinh / mật khẩu -> Phải báo đúng lỗi
+    # TEST 5: Đúng mã học sinh nhưng sai ngày sinh -> Phải báo đúng lỗi
     try:
         req = urllib.request.Request(
             f"{base_url}/api/lookup",
-            data=json.dumps({"identifier": "10000001", "secret": "01/01/2000"}).encode("utf-8"),
+            data=json.dumps({"identifier": "10000001", "dob": "01/01/2000"}).encode("utf-8"),
             headers={"Content-Type": "application/json"}
         )
         urllib.request.urlopen(req)
-        assert_test("Bắt lỗi sai thông tin xác thực", False, "Đáng lẽ phải trả về lỗi 400")
+        assert_test("Bắt lỗi sai ngày sinh", False, "Đáng lẽ phải trả về lỗi 400")
     except urllib.error.HTTPError as e:
         err_data = json.loads(e.read().decode("utf-8"))
         assert_test(
-            "Bắt lỗi sai thông tin xác thực",
-            e.code == 400 and ("Thông tin xác thực" in err_data.get("error", "") or "không khớp" in err_data.get("error", "")),
+            "Bắt lỗi sai ngày sinh",
+            e.code == 400 and ("Ngày tháng năm sinh không khớp" in err_data.get("error", "") or "không khớp" in err_data.get("error", "")),
             f"Code: {e.code}, Data: {err_data}"
         )
 
@@ -139,7 +139,7 @@ def run_tests():
     try:
         req = urllib.request.Request(
             f"{base_url}/api/lookup",
-            data=json.dumps({"identifier": "99999999", "secret": "01/01/2000"}).encode("utf-8"),
+            data=json.dumps({"identifier": "99999999", "dob": "01/01/2000"}).encode("utf-8"),
             headers={"Content-Type": "application/json"}
         )
         urllib.request.urlopen(req)
@@ -174,17 +174,17 @@ def run_tests():
     except (urllib.error.HTTPError, urllib.error.URLError) as e:
         assert_test("Chặn tấn công Path Traversal", True)
 
-    # TEST 9: Đăng nhập bằng Email trường đầy đủ & Mật khẩu Ngày sinh (ddmmyyyy) qua Unified API
+    # TEST 9: Tra cứu bằng Email trường đầy đủ + Ngày sinh ddmmyyyy
     try:
         req = urllib.request.Request(
             f"{base_url}/api/lookup",
-            data=json.dumps({"identifier": "24001@ttgdtxcva.edu.vn", "secret": "27022009"}).encode("utf-8"),
+            data=json.dumps({"identifier": "24001@ttgdtxcva.edu.vn", "dob": "27022009"}).encode("utf-8"),
             headers={"Content-Type": "application/json"}
         )
         with urllib.request.urlopen(req) as resp:
             data = json.loads(resp.read().decode("utf-8"))
             assert_test(
-                "Unified Form: Email trường đầy đủ (24001@ttgdtxcva.edu.vn) + Ngày sinh ddmmyyyy",
+                "Tra cứu Email trường đầy đủ (24001@ttgdtxcva.edu.vn) + Ngày sinh ddmmyyyy",
                 data.get("success") is True and data["student"]["full_name"] == "MAI HỒNG AN" and data["student"]["email"] == "24001@ttgdtxcva.edu.vn"
             )
             assert_test(
@@ -192,29 +192,29 @@ def run_tests():
                 "password_hash" not in data["student"]
             )
     except Exception as e:
-        assert_test("Unified Form: Email trường đầy đủ", False, str(e))
+        assert_test("Tra cứu Email trường đầy đủ", False, str(e))
 
-    # TEST 10: Unified Form: MSHS (5 số: 26040) + Ngày sinh (14/04/2011)
+    # TEST 10: Tra cứu đơn giản: 5 số MSHS (26040) + Ngày sinh (14/04/2011)
     try:
         req = urllib.request.Request(
             f"{base_url}/api/lookup",
-            data=json.dumps({"identifier": "26040", "secret": "14/04/2011"}).encode("utf-8"),
+            data=json.dumps({"identifier": "26040", "dob": "14/04/2011"}).encode("utf-8"),
             headers={"Content-Type": "application/json"}
         )
         with urllib.request.urlopen(req) as resp:
             data = json.loads(resp.read().decode("utf-8"))
             assert_test(
-                "Unified Form: 5 số MSHS (26040) + Ngày sinh dd/mm/yyyy",
+                "Tra cứu đơn giản: 5 số MSHS (26040) + Ngày sinh dd/mm/yyyy",
                 data.get("success") is True and data["student"]["full_name"] == "NGÔ DIỆU ÁI" and data["student"]["display_mshs"] == "26040"
             )
     except Exception as e:
-        assert_test("Unified Form: 5 số MSHS (26040)", False, str(e))
+        assert_test("Tra cứu đơn giản: 5 số MSHS (26040)", False, str(e))
 
     # TEST 11: Bảo mật - Không có mật khẩu chung trường (cva@123 phải bị chặn)
     try:
         req = urllib.request.Request(
             f"{base_url}/api/lookup",
-            data=json.dumps({"identifier": "24001", "secret": "cva@123"}).encode("utf-8"),
+            data=json.dumps({"identifier": "24001", "dob": "cva@123"}).encode("utf-8"),
             headers={"Content-Type": "application/json"}
         )
         urllib.request.urlopen(req)
@@ -223,32 +223,32 @@ def run_tests():
         err_data = json.loads(e.read().decode("utf-8"))
         assert_test(
             "Chặn mật khẩu chung của trường (cva@123)",
-            e.code == 400 and ("Thông tin xác thực" in err_data.get("error", "") or "không khớp" in err_data.get("error", "")),
+            e.code == 400 and ("Ngày tháng năm sinh không khớp" in err_data.get("error", "") or "không khớp" in err_data.get("error", "")),
             f"Code: {e.code}, Data: {err_data}"
         )
 
-    # TEST 12: Đăng nhập với sai mật khẩu/ngày sinh -> Phải báo đúng lỗi 400
+    # TEST 12: Sai ngày sinh -> Phải báo đúng lỗi 400
     try:
         req = urllib.request.Request(
             f"{base_url}/api/lookup",
-            data=json.dumps({"identifier": "24001@ttgdtxcva.edu.vn", "secret": "sai_thong_tin_hoan_toan"}).encode("utf-8"),
+            data=json.dumps({"identifier": "24001@ttgdtxcva.edu.vn", "dob": "01012000"}).encode("utf-8"),
             headers={"Content-Type": "application/json"}
         )
         urllib.request.urlopen(req)
-        assert_test("Bắt lỗi sai mật khẩu đăng nhập", False, "Đáng lẽ phải trả về lỗi 400")
+        assert_test("Bắt lỗi sai ngày sinh", False, "Đáng lẽ phải trả về lỗi 400")
     except urllib.error.HTTPError as e:
         err_data = json.loads(e.read().decode("utf-8"))
         assert_test(
-            "Bắt lỗi sai mật khẩu đăng nhập",
-            e.code == 400 and ("Thông tin xác thực" in err_data.get("error", "") or "không khớp" in err_data.get("error", "")),
+            "Bắt lỗi sai ngày sinh",
+            e.code == 400 and ("Ngày tháng năm sinh không khớp" in err_data.get("error", "") or "không khớp" in err_data.get("error", "")),
             f"Code: {e.code}, Data: {err_data}"
         )
 
-    # TEST 13: Đăng nhập với Email không tồn tại
+    # TEST 13: Tra cứu với Email không tồn tại
     try:
         req = urllib.request.Request(
             f"{base_url}/api/lookup",
-            data=json.dumps({"identifier": "email_khong_ton_tai@ttgdtxcva.edu.vn", "secret": "123"}).encode("utf-8"),
+            data=json.dumps({"identifier": "email_khong_ton_tai@ttgdtxcva.edu.vn", "dob": "14/04/2011"}).encode("utf-8"),
             headers={"Content-Type": "application/json"}
         )
         urllib.request.urlopen(req)

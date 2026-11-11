@@ -90,20 +90,20 @@ export async function onRequestPost(context) {
       );
     }
 
-    // Lấy thông tin định danh (identifier) và thông tin bảo mật (secret)
-    const rawIdentifier = String(body.identifier || body.studentId || body.email || "").trim();
-    const rawSecret = String(body.secret || body.dob || body.password || "").trim();
+    // Lấy thông tin định danh (identifier/mshs) và ngày sinh (dob/secret)
+    const rawIdentifier = String(body.identifier || body.mshs || body.studentId || body.email || "").trim();
+    const rawSecret = String(body.dob || body.secret || body.password || "").trim();
 
     if (!rawIdentifier || !rawSecret) {
       return new Response(
-        JSON.stringify({ error: "Vui lòng nhập đầy đủ Mã số học sinh (hoặc Email) và Ngày sinh (hoặc Mật khẩu)." }),
+        JSON.stringify({ error: "Vui lòng nhập đầy đủ Mã số học sinh và Ngày tháng năm sinh." }),
         { status: 400, headers: corsHeaders }
       );
     }
 
     const accId = rawIdentifier.split("@")[0];
 
-    // 1. Tìm bản ghi học sinh dựa trên mọi loại mã định danh
+    // 1. Tìm bản ghi học sinh dựa trên 5 số MSHS, email trường hoặc mã thi cũ
     const studentStmt = env.DB.prepare(`
       SELECT id, mshs, student_id, full_name, class_name, gender, dob, campus, email, account_id, password_hash
       FROM students
@@ -121,13 +121,13 @@ export async function onRequestPost(context) {
     if (!studentRow) {
       return new Response(
         JSON.stringify({
-          error: "Không tìm thấy học sinh với thông tin này. Gợi ý: Nhập 5 số mã học sinh (5 số email trường của em, ví dụ: 26040, 24001)!",
+          error: "Không tìm thấy học sinh với thông tin này. Gợi ý: Nhập đúng 5 số mã học sinh (5 số trong email trường của em, ví dụ: 26040, 24001)!",
         }),
         { status: 400, headers: corsHeaders }
       );
     }
 
-    // 2. Tự động kiểm tra thông tin bảo mật (Ngày sinh hoặc Mật khẩu)
+    // 2. Kiểm tra ngày sinh học sinh (hỗ trợ dd/mm/yyyy, ddmmyyyy, yyyy-mm-dd)
     let isValid = false;
 
     // a. So khớp Ngày sinh (chuẩn hóa định dạng dd/mm/yyyy)
@@ -145,7 +145,7 @@ export async function onRequestPost(context) {
       }
     }
 
-    // c. So khớp qua hàm xác thực mật khẩu
+    // c. So khớp qua hàm xác thực mật khẩu cá nhân (nếu học sinh nhập mật khẩu riêng)
     if (!isValid) {
       isValid = await verifyStudentPassword(studentRow, rawSecret);
     }
@@ -153,7 +153,7 @@ export async function onRequestPost(context) {
     if (!isValid) {
       return new Response(
         JSON.stringify({
-          error: "Thông tin xác thực (Ngày sinh hoặc Mật khẩu) không khớp. Vui lòng kiểm tra lại ngày sinh (ngày/tháng/năm)!",
+          error: "Ngày tháng năm sinh không khớp với dữ liệu học sinh. Vui lòng kiểm tra lại ngày sinh (ngày/tháng/năm)!",
         }),
         { status: 400, headers: corsHeaders }
       );
